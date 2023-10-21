@@ -1,10 +1,11 @@
 create table "RESEARCHERS"
 (
-    "userUuid" uuid not null
+    "userUuid" uuid    not null
         primary key
         references "USERS"
             on delete cascade,
-    cv         bytea
+    cv         bytea,
+    password   varchar not null
 );
 
 alter table "RESEARCHERS"
@@ -13,4 +14,3 @@ alter table "RESEARCHERS"
 grant select on "RESEARCHERS" to evaluator;
 
 grant insert, select, update on "RESEARCHERS" to researcher;
-
