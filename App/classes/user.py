@@ -8,9 +8,9 @@ class User(Base):
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
     email = Column(String, nullable=False)
-    dateofbirth = Column('dateofbirth', DateTime,nullable=False)
+    dateofbirth = Column('dateofbirth', DateTime, nullable=False)
 
-    def __init__(self, name:str, surname:str, email:str, dateofbirth:DateTime, uuid:UUID=null):
+    def __init__(self, name: str, surname: str, email: str, dateofbirth: DateTime, uuid: UUID = null):
         self.name = name
         self.surname = surname
         self.email = email
