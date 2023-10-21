@@ -26,5 +26,5 @@ class Admin(User, UserMixin):
                 'dateofbirth': str(super().dateofbirth)}
 
     def __repr__(self):
-        return (f"Admin(userUuid:{self.uuid},name = '{self.name}', surname='{self.surname}',"
+        return (f"Admin(userUuid:{self.userUuid},name = '{self.name}', surname='{self.surname}',"
                 f"email:{self.email}, password='***', dateofbirt={self.dateofbirth},uuid={self.uuid})")
