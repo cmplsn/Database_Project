@@ -5,7 +5,7 @@ from classes.authors import authors
 import enum
 
 
-class EvaluationsEnum(enum.Enum): # todo: capire bene sta cosa degli enum come usarli sia qui che sul DB
+class EvaluationsEnum(enum.Enum):  # todo: capire bene sta cosa degli enum come usarli sia qui che sul DB
     approvato = 1
     sottomessoperval = 2
     damodificare = 3
@@ -14,6 +14,7 @@ class EvaluationsEnum(enum.Enum): # todo: capire bene sta cosa degli enum come u
 
 class Project(Base):
     __tablename__ = 'PROJECT'
+
     uuid = Column(UUID(as_uuid=True), primary_key=True)
     title = Column(String, nullable=False)
     description = Column(Text)
@@ -31,5 +32,5 @@ class Project(Base):
             self.uuid = uuid
 
     # todo: con questa funzione è possibile rappresentare l'istanza come una stringa ben formattata
-    # def __repr__(self):
-        # return f"Project(uuid={self.uuid},title={self.title},description={self.description}, status='{self.status}')"
+    def __repr__(self):
+        return f"Project(uuid={self.uuid},title={self.title},description={self.description}, status='{self.status}')"

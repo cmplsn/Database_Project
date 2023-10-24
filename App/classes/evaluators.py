@@ -2,7 +2,7 @@ import bcrypt
 from flask_login import UserMixin
 from sqlalchemy import *
 from sqlalchemy.orm import relationship
-from user import User
+from classes.user import User
 
 
 class Evaluator(User, UserMixin):

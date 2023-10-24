@@ -2,6 +2,15 @@ from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 Base = declarative_base()
+url_user = URL.create('postgresql+psycopg',
+                      'user',
+                      'pwd',
+                      'localhost',
+                      5432,
+                      'BasiDiDati')
+engine_user = create_engine(url_user, echo=True, execution_options={"schema_translate_map": {None: 'project_schema'}})
+userSess = sessionmaker(bind=engine_user)
+userSess = userSess()
 
 # url per connessione database admin
 url_admin = URL.create('postgresql+psycopg',

@@ -3,17 +3,17 @@ from flask_login import UserMixin
 from sqlalchemy import *
 from sqlalchemy.orm import relationship
 from classes.authors import authors
-from user import User
+from classes.user import User
 
 
 class Researcher(User, UserMixin):
     __tablename__ = 'RESEARCHERS'
-
     userUuid = Column(ForeignKey("USERS.uuid", ondelete='CASCADE'), primary_key=True)
     password = Column(String, nullable=False)
     cv = Column(LargeBinary)
     authors = relationship("Project", secondary=authors, back_populates='RESEARCHERS')
     messages = relationship("Messages")
+    versions = relationship("Versions")
 
     def __init__(self,  name: str, surname: str, email: str, password: str, cv: LargeBinary, dateofbirth: DateTime,
                  uuid: UUID = null):
