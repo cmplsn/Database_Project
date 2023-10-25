@@ -6,13 +6,13 @@ from classes.user import User
 
 
 class Evaluator(User, UserMixin):
-    __tablename__ = 'EVALUATORS'
+    __tablename__ = 'EVALUATOR'
 
     userUuid = Column(ForeignKey("USERS.uuid", ondelete='CASCADE'), primary_key=True)
     password = Column(String, nullable=False)
     cv = Column(LargeBinary)
 
-    report = relationship("Report")
+    # report = relationship("Report")
 
     def __init__(self, name: str, surname: str, email: str, password: str, cv: LargeBinary, dateofbirth: DateTime,
                  uuid: UUID = null):

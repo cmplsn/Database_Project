@@ -12,9 +12,9 @@ class Researcher(User, UserMixin):
     userUuid = Column(ForeignKey("USERS.uuid", ondelete='CASCADE'), primary_key=True)
     password = Column(String, nullable=False)
     cv = Column(LargeBinary)
-    authors = relationship("Project", secondary=authors, back_populates='RESEARCHERS')
-    messages = relationship("Messages")
-    versions = relationship("Versions")
+    # authors = relationship("Project", secondary=authors, back_populates='RESEARCHERS')
+    # messages = relationship("Messages")
+    # versions = relationship("Versions")
 
     def __init__(self,  name: str, surname: str, email: str, password: str, cv: LargeBinary, dateofbirth: DateTime,
                  uuid: UUID = null):

@@ -8,7 +8,7 @@ from classes.user import User
 class Admin(User, UserMixin):
     __tablename__ = 'ADMIN'
     userUuid = Column(ForeignKey("USERS.uuid", ondelete='CASCADE'), primary_key=True)
-    password = Column(Text, nullable=False)
+    password = Column(String, nullable=False)
 
     def __init__(self, name: str, surname: str, email: str, password: str, dateofbirth: DateTime, uuid: UUID = null):
         super().__init__(name, surname, email, dateofbirth, uuid)

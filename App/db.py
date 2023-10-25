@@ -5,7 +5,7 @@ Base = declarative_base()
 
 # url per connessione database admin
 url_admin = URL.create('postgresql+psycopg',
-                       'admin',
+                       'admin_user',
                        'pwd',
                        'localhost',
                        5432,
@@ -17,7 +17,7 @@ adminSess = adminSess()
 
 # url connessione researcher
 url_res = URL.create('postgresql+psycopg',
-                     'researcher',
+                     'res_user',
                      'pwd',
                      'localhost',
                      5432,
@@ -29,13 +29,13 @@ resSess = resSess()
 
 # url connessione evaluator
 url_ev = URL.create('postgresql+psycopg',
-                    'evaluator',
+                    'ev_user',
                     'pwd',
                     'localhost',
                     5432,
                     'BasiDiDati')
 engine_ev = create_engine(url_ev, echo=True,
-                          execution_options={"schema_translate_map":{None: 'project_schema'}})
+                          execution_options={"schema_translate_map": {None: 'project_schema'}})
 evSess = sessionmaker(bind=engine_ev)
 evSess = evSess()
 

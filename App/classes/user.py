@@ -1,10 +1,11 @@
 from sqlalchemy import *
 from db import Base
+import uuid
 
 
 class User(Base):
     __tablename__ = 'USERS'
-    uuid = Column(UUID(as_uuid=True), primary_key=True)  # default=uuid.uuid4)
+    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
     email = Column(String, nullable=False)
