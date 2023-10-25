@@ -1,7 +1,7 @@
 from flask import *
 from flask_login import *
 from sqlalchemy import *
-from db import adminSess, resSess, evSess, userSess
+from db import adminSess, resSess, evSess
 from classes.admin import Admin
 from classes.researcher import Researcher
 from classes.evaluators import Evaluator
@@ -39,7 +39,48 @@ def home():  # put application's code here
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    return render_template("home.html")
+    if request.method == 'POST':
+        try:
+            # Verifica se user è presente in db
+            user = evSess.execute(select(User).where(User.email==request.form['email'])).fetchone()
+            if user is None:
+                return render_template('home.html', login_error=True)
+
+            adm=adminSess.execute(select(Admin).where(Admin.userUuid == user[0].uuid)).fetchone()
+            ev = evSess.execute(select(Evaluator).where(Evaluator.userUuid == user[0].uuid)).fetchone()
+            res = resSess.execute(select(Researcher).where(Researcher.userUuid == user[0].uuid)).fetchone()
+
+            # Controlla se sta facendo login Admin
+            if adm is not None:
+                if adm.Admin.auth_pwd(request.form['password']):
+                    login_user(adm.Admin)
+                else:
+                    return render_template('home.html', login_error=True)
+            elif ev is not None:
+                ev = ev.Evaluator
+                if ev.auth_pwd(request.form['password']):
+                    login_user(ev)
+                    return redirect(url_for('/private'))
+                else:
+                    return render_template('home.html', login_error=True)
+            elif res is not None:
+                res = res.Researcher
+                if res.auth_pwd(request.form['password']):
+                    login_user(res)
+                    return redirect(url_for('/private'))
+                else:
+                    return render_template('home.html', login_error=True)
+            else:
+                return render_template('home.html', login_error=True)
+        except Exception as e:
+            print(e)
+            evSess.rollback()
+        return render_template("home.html")
+    else:
+        if current_user.is_authenticated:
+            return redirect(url_for('/private'))
+        else:
+            return render_template('home.html')
 
 
 '''@app.route('/login', methods=['GET', 'POST'])

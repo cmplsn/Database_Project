@@ -5,20 +5,25 @@
     <title>Homepage</title>
 </head>
 <body>
+
+    {% if login_error %}
+        <div class="alert alert-danger" role="alert">
+        Email o Password ERRATE
+        </div>
+    {% endif %}
 <h1>Project Evaluation</h1>
+<form method="post">
     <div>
-        <h4> Already a Member?</h4>
-        <form action="/login">
-            <button type="submit">Login here</button>
-        </form>
+        <input name="email" type="email" id="email"/>
+        <label for="email">Email</label>
     </div>
     <div>
-        <h4>OR</h4>
-        <form action="/register">
-            <button type="submit">
-                Register
-            </button>
-        </form>
+        <input name="password" type="password" id="password"/>
+        <label for="password">Password</label>
     </div>
+
+    <input type="submit" value="Login">
+</form>
+
 </body>
 </html>

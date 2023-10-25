@@ -4,6 +4,7 @@ from sqlalchemy import *
 from sqlalchemy.orm import relationship
 from classes.authors import authors
 from classes.user import User
+from classes.project import Project
 
 
 class Researcher(User, UserMixin):
