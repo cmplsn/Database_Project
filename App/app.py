@@ -1,3 +1,6 @@
+import datetime
+from datetime import timedelta
+
 from flask import *
 from flask_login import *
 from sqlalchemy import *
@@ -6,14 +9,20 @@ from classes.admin import Admin
 from classes.researcher import Researcher
 from classes.evaluators import Evaluator
 from classes.user import User
-from testing import testing
+# from testing import testing
 
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'askh7-wur0z!'
 login_manager = LoginManager()
 login_manager.init_app(app)
-testing()
+
+dvd = Researcher('Davide', 'Vecchiato', 'dv@d.com', 'DavideVecchiato',cv  = open('Ricetta Campagnaro Romeo.pdf','rb').read(),
+                 dateofbirth=datetime.date(2002, 9, 27))
+adminSess.add(dvd)
+adminSess.commit()
+
+adminSess.close()
 
 
 # todo: controllare cos'è
@@ -45,16 +54,22 @@ def home():  # put application's code here
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+
+    # settato la chiusura della sessione dopo tempo max 5 minuti
+    session.permanent = True
+    app.permanent_session_lifetime = timedelta(minutes=5)
+
+    #riconosco metodo di richiesto come POST dal form html
     if request.method == 'POST':
         try:
-            # Verifica se user è presente in db
+            # Verifica se User è presente in db "USER"
             user = evSess.execute(select(User).where(User.email==request.form['email'])).fetchone()
             if user is None:
                 return render_template('home.html', login_error=True)
 
-            adm=adminSess.execute(select(Admin).where(Admin.userUuid == user[0].uuid)).fetchone()
-            ev = evSess.execute(select(Evaluator).where(Evaluator.userUuid == user[0].uuid)).fetchone()
-            res = resSess.execute(select(Researcher).where(Researcher.userUuid == user[0].uuid)).fetchone()
+            adm = adminSess.execute(select(Admin).where(Admin.userUuid == user.uuid)).fetchone()
+            ev = evSess.execute(select(Evaluator).where(Evaluator.userUuid == user.uuid)).fetchone()
+            res = resSess.execute(select(Researcher).where(Researcher.userUuid == user.uuid)).fetchone()
 
             # Controlla se sta facendo login Admin
             if adm is not None:
@@ -65,6 +80,7 @@ def login():
                 else:
                     return render_template('home.html', login_error=True)
             elif ev is not None:
+                # Controlla se login è di tipo Evaluator
                 ev = ev.Evaluator
                 print('ho trovato evaluator in login')
                 if ev.auth_pwd(request.form['password']):
@@ -73,6 +89,7 @@ def login():
                 else:
                     return render_template('home.html', login_error=True)
             elif res is not None:
+                # controlla se login è di tipo Researcher
                 res = res.Researcher
                 print('ho trovato researcher in login')
                 if res.auth_pwd(request.form['password']):
@@ -99,7 +116,8 @@ def private():
     return render_template("private.html")
 
 
-@app.route("/logout")
+@app.route('/logout')
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('home'))
