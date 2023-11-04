@@ -9,7 +9,7 @@ from classes.admin import Admin
 from classes.researcher import Researcher
 from classes.evaluators import Evaluator
 from classes.user import User
-# from testing import testing
+#from testing import testing
 
 
 app = Flask(__name__)
@@ -17,44 +17,47 @@ app.config['SECRET_KEY'] = 'askh7-wur0z!'
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-dvd = Researcher('Davide', 'Vecchiato', 'dv@d.com', 'DavideVecchiato',cv  = open('Ricetta Campagnaro Romeo.pdf','rb').read(),
-                 dateofbirth=datetime.date(2002, 9, 27))
-adminSess.add(dvd)
-adminSess.commit()
-
-adminSess.close()
-
-
 # todo: controllare cos'è
 # ip_ban = IpBan(ban_count=5)
 # ip_ban.init_app(app)
 
+print("ho iniziato exe app")
+testing()
+
 
 @login_manager.user_loader
 def load_user(user_id):
-    admin = adminSess.execute(select(Admin).where(Admin.uuid == user_id)).fetchone()
+    print('sono entrato in load_user()')
+    admin = adminSess.execute(select(Admin).where(Admin.userUuid == user_id)).fetchone()
     if admin is not None:
         print('ho trovato Admin')
         return admin.Admin
+
+    user = evSess.execute(select(User).where(User.uuid==user_id)).fetchone()
+
     # todo: chiedere elia perchè messo user = teacherSession(...)
-    evaluator = evSess.execute(select(Evaluator).where(Evaluator.userUuid == user_id)).fetchone().Evaluator
-    if evaluator is not None:
-        print('ho trovato evaluator')
-        return Evaluator
-    researcher = resSess.execute(select(Researcher).where(Researcher.userUuid == user_id)).fetchone().Researcher
-    if researcher is not None:
-        print('ho trovato researcher')
-        return Researcher
+    evaluator = evSess.execute(select(Evaluator).where(Evaluator.userUuid == user[0].uuid)).fetchone()
+    if evaluator is None:
+        researcher = resSess.execute(select(Researcher).where(Researcher.userUuid == user[0].uuid)).fetchone()
+        if researcher is not None:
+            return researcher.Researcher
+    else:
+        return evaluator.Evaluator
+    print('finita riga 39 codice')
+
+    # aggiungere ritorna errore di caricamento user
+
 
 
 @app.route('/')
 def home():  # put application's code here
+    print('sono entrato in home()')
     return redirect(url_for('login'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-
+    print('sono entrato in login()')
     # settato la chiusura della sessione dopo tempo max 5 minuti
     session.permanent = True
     app.permanent_session_lifetime = timedelta(minutes=5)
@@ -67,9 +70,9 @@ def login():
             if user is None:
                 return render_template('home.html', login_error=True)
 
-            adm = adminSess.execute(select(Admin).where(Admin.userUuid == user.uuid)).fetchone()
-            ev = evSess.execute(select(Evaluator).where(Evaluator.userUuid == user.uuid)).fetchone()
-            res = resSess.execute(select(Researcher).where(Researcher.userUuid == user.uuid)).fetchone()
+            adm = adminSess.execute(select(Admin).where(Admin.userUuid == user[0].uuid)).fetchone()
+            ev = evSess.execute(select(Evaluator).where(Evaluator.userUuid == user[0].uuid)).fetchone()
+            res = resSess.execute(select(Researcher).where(Researcher.userUuid == user[0].uuid)).fetchone()
 
             # Controlla se sta facendo login Admin
             if adm is not None:
