@@ -9,7 +9,7 @@ from classes.admin import Admin
 from classes.researcher import Researcher
 from classes.evaluators import Evaluator
 from classes.user import User
-#from testing import testing
+from testing import testing
 
 
 app = Flask(__name__)

@@ -2,10 +2,12 @@ import datetime
 import enum
 
 from classes.admin import Admin
+from classes.user import User
 from classes.researcher import Researcher
 from classes.evaluators import Evaluator
 from classes.authors import authors
 from classes.project import Project, EvaluationsEnum
+from sqlalchemy import *
 from db import adminSess
 
 
@@ -20,18 +22,19 @@ def testing():
                    cv=open("pdf/CV - Campagnaro Alessandro.pdf",'rb').read(),
                    dateofbirth=datetime.date(1964,6,14))
     adminSess.add(adm)
-    adminSess.add(res)
     adminSess.add(ev)
-    adminSess.commit()
 
     # Inserimento PROJECT
 
     proj1 = Project("Prova Esempio", "descrizione prova esempio", status=EvaluationsEnum.sottomessoperval.value)
+
+    # Inserimento AUTHOR
+    # res.project = [proj1]
+    proj1.researchers = [res]
+    adminSess.add(res)
     adminSess.add(proj1)
     adminSess.commit()
-    adminSess.close()
 
-    #Inserimento AUTHOR
-    auth = authors(res.uuid,proj1.uuid)
-    adminSess.add(auth)
-    adminSess.commit()
+    """adminSess.execute(delete(User))
+    adminSess.execute(delete(Project))
+    adminSess.commit()"""

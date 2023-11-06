@@ -1,7 +1,7 @@
 import bcrypt
 from flask_login import UserMixin
 from sqlalchemy import *
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped,mapped_column, DeclarativeBase, relationships
 from classes.authors import authors
 from classes.user import User
 from classes.project import Project
@@ -12,7 +12,7 @@ class Researcher(User, UserMixin):
     userUuid = Column(ForeignKey("USERS.uuid", ondelete='CASCADE'), primary_key=True)
     password = Column(String, nullable=False)
     cv = Column(LargeBinary)
-    # authors = relationship("Project", secondary=authors, back_populates='RESEARCHERS')
+    project = relationship('Project', secondary=authors, back_populates='researchers')
     # messages = relationship("Messages")
     # versions = relationship("Versions")
 

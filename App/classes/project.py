@@ -19,7 +19,7 @@ class Project(Base):
     title = Column(String, nullable=False)
     description = Column(Text)
     status = Column(Enum(EvaluationsEnum), nullable=False, default=EvaluationsEnum.sottomessoperval.value)
-    # authors = relationship("Researcher", secondary=authors, back_populates="PROJECT")
+    researchers = relationship('Researcher', secondary=authors, back_populates="project")
     # file = relationship("File")
     # messages = relationship("Messages")
 
