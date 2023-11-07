@@ -15,7 +15,7 @@ class Versions(Base):
     version = Column(Integer, nullable=False)
     uuid = Column(UUID(as_uuid=True), primary_key=True)
     fileuuid = Column(ForeignKey("FILE.uuid", ondelete='CASCADE'))
-    report = relationship("Versions")
+    #report = relationship("Versions")
 
     def __init__(self, details: Text, submitdata: DateTime, version: Integer, file: LargeBinary, fileuuid: UUID,
                  uuid: UUID = null):

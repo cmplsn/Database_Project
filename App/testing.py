@@ -7,6 +7,7 @@ from classes.researcher import Researcher
 from classes.evaluators import Evaluator
 from classes.authors import authors
 from classes.project import Project, EvaluationsEnum
+from classes.file import File
 from sqlalchemy import *
 from db import adminSess
 
@@ -26,13 +27,18 @@ def testing():
 
     # Inserimento PROJECT
 
-    proj1 = Project("Prova Esempio", "descrizione prova esempio", status=EvaluationsEnum.sottomessoperval.value)
+    proj1 = Project("Prova Esempio", "descrizione prova esempio",
+                    status=EvaluationsEnum.sottomessoperval.value)
 
     # Inserimento AUTHOR
     # res.project = [proj1]
     proj1.researchers = [res]
     adminSess.add(res)
     adminSess.add(proj1)
+
+    #Inserimento FILE
+    fileprova = File("prova", proj1.uuid)
+    adminSess.add(fileprova)
     adminSess.commit()
 
     """adminSess.execute(delete(User))

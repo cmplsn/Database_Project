@@ -9,8 +9,8 @@ class File(Base):
 
     uuid = Column(UUID(as_uuid=True), primary_key=True)
     title = Column(String, nullable=False)
-    projectuuid = Column(ForeignKey("PROJECT.uuid", ondelete='CASCADE'))
-    version = relationship("Versions")
+    projectuuid = Column("ProjectUuid", ForeignKey("PROJECT.uuid", ondelete='CASCADE'))
+    project = relationship("Project")
 
     def __init__(self, title: str, projectuuid: UUID, uuid: UUID = null):
         self.projectuuid = projectuuid
