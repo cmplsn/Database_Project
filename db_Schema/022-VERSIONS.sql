@@ -16,5 +16,9 @@ alter table "VERSIONS"
 
 grant insert, select on "VERSIONS" to evaluator;
 
+grant delete, insert, references, select, trigger, truncate, update on "VERSIONS" to admin_role;
+
 grant insert, select, update on "VERSIONS" to researcher;
+
+grant delete, insert, references, select, trigger, truncate, update on "VERSIONS" to admin_user;
 

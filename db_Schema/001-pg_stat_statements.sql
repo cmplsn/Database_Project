@@ -70,6 +70,10 @@ alter table pg_stat_statements
 
 grant select on pg_stat_statements to public;
 
+grant delete, insert, references, select, trigger, truncate, update on pg_stat_statements to admin_role;
+
+grant delete, insert, references, select, trigger, truncate, update on pg_stat_statements to admin_user;
+
 create function pg_stat_statements(showtext boolean, out userid oid, out dbid oid, out toplevel boolean, out queryid bigint, out query text, out plans bigint, out total_plan_time double precision, out min_plan_time double precision, out max_plan_time double precision, out mean_plan_time double precision, out stddev_plan_time double precision, out calls bigint, out total_exec_time double precision, out min_exec_time double precision, out max_exec_time double precision, out mean_exec_time double precision, out stddev_exec_time double precision, out rows bigint, out shared_blks_hit bigint, out shared_blks_read bigint, out shared_blks_dirtied bigint, out shared_blks_written bigint, out local_blks_hit bigint, out local_blks_read bigint, out local_blks_dirtied bigint, out local_blks_written bigint, out temp_blks_read bigint, out temp_blks_written bigint, out blk_read_time double precision, out blk_write_time double precision, out temp_blk_read_time double precision, out temp_blk_write_time double precision, out wal_records bigint, out wal_fpi bigint, out wal_bytes numeric, out jit_functions bigint, out jit_generation_time double precision, out jit_inlining_count bigint, out jit_inlining_time double precision, out jit_optimization_count bigint, out jit_optimization_time double precision, out jit_emission_count bigint, out jit_emission_time double precision) returns setof setof record
     strict
     parallel safe

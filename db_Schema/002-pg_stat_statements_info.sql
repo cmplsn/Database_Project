@@ -8,6 +8,10 @@ alter table pg_stat_statements_info
 
 grant select on pg_stat_statements_info to public;
 
+grant delete, insert, references, select, trigger, truncate, update on pg_stat_statements_info to admin_role;
+
+grant delete, insert, references, select, trigger, truncate, update on pg_stat_statements_info to admin_user;
+
 create function pg_stat_statements_info(out dealloc bigint, out stats_reset timestamp with time zone) returns record
     strict
     parallel safe

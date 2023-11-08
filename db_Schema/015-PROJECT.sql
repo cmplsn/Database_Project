@@ -12,5 +12,9 @@ alter table "PROJECT"
 
 grant insert, select, update on "PROJECT" to evaluator;
 
+grant delete, insert, references, select, trigger, truncate, update on "PROJECT" to admin_role;
+
 grant insert, select, update on "PROJECT" to researcher;
+
+grant delete, insert, references, select, trigger, truncate, update on "PROJECT" to admin_user;
 

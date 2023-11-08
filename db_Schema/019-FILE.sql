@@ -12,5 +12,9 @@ alter table "FILE"
 
 grant select on "FILE" to evaluator;
 
+grant delete, insert, references, select, trigger, truncate, update on "FILE" to admin_role;
+
 grant insert, select on "FILE" to researcher;
+
+grant delete, insert, references, select, trigger, truncate, update on "FILE" to admin_user;
 

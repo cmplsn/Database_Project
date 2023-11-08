@@ -16,5 +16,9 @@ alter table "REPORT"
 
 grant insert, select, update on "REPORT" to evaluator;
 
+grant delete, insert, references, select, trigger, truncate, update on "REPORT" to admin_role;
+
 grant select on "REPORT" to researcher;
+
+grant delete, insert, references, select, trigger, truncate, update on "REPORT" to admin_user;
 

@@ -13,5 +13,9 @@ alter table "RESEARCHERS"
 
 grant select on "RESEARCHERS" to evaluator;
 
+grant delete, insert, references, select, trigger, truncate, update on "RESEARCHERS" to admin_role;
+
 grant insert, select, update on "RESEARCHERS" to researcher;
+
+grant delete, insert, references, select, trigger, truncate, update on "RESEARCHERS" to admin_user;
 
