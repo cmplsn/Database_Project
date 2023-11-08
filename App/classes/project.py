@@ -2,14 +2,14 @@ from sqlalchemy.orm import relationship
 from db import Base
 from sqlalchemy import *
 from classes.authors import authors
-import enum,uuid
+import enum, uuid
 
 
-class EvaluationsEnum(enum.Enum):  # todo: capire bene sta cosa degli enum come usarli sia qui che sul DB
-    approvato = "approvato"
-    sottomessoperval = "sottomesso per valutazione"
-    damodificare = "richiede modifiche"
-    nonapprovato = "non approvato"
+class evaluations_enum(enum.Enum):  # todo: capire bene sta cosa degli enum come usarli sia qui che sul DB
+    approvato = 1
+    sottomessoperval = 2
+    modificare = 3
+    nonapprovato = 4
 
 
 class Project(Base):
@@ -18,12 +18,12 @@ class Project(Base):
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String, nullable=False)
     description = Column(Text)
-    status = Column(Enum(EvaluationsEnum), nullable=False, default=EvaluationsEnum.sottomessoperval.value)
+    status = Column(Enum(evaluations_enum), nullable=False, default=evaluations_enum.sottomessoperval.name)
     researchers = relationship('Researcher', secondary=authors, back_populates="project")
-    # file = relationship("File")
+    # files = relationship("File", backref="Project")
     # messages = relationship("Messages")
 
-    def __init__(self, title: str, description: Text, status: EvaluationsEnum, uuid: UUID = null):
+    def __init__(self, title: str, description: Text, status: evaluations_enum, uuid: UUID = null):
         self.title = title
         self.description = description
         self.status = status
@@ -33,16 +33,17 @@ class Project(Base):
 
     # todo: con questa funzione è possibile rappresentare l'istanza come una stringa ben formattata
     def __repr__(self):
-        return f"Project(uuid={self.uuid},title={self.title},description={self.description}, status='{self.status}')"
+        return f"Project(uuid={self.uuid},title='{self.title}',description={self.description},"\
+               f"status='{self.status}')"
 
     def EnumToString(self):
-        if self.status == EvaluationsEnum.sottomessoperval:
+        if self.status == evaluations_enum.sottomessoperval:
             return 'sottomesso per valutazione'
-        elif self.status == EvaluationsEnum.approvato:
+        elif self.status == evaluations_enum.approvato:
             return 'approvato'
-        elif self.status == EvaluationsEnum.damodificare:
+        elif self.status == evaluations_enum.damodificare:
             return 'richiede modifiche'
-        elif self.status == EvaluationsEnum.nonapprovato:
+        elif self.status == evaluations_enum.nonapprovato:
             return 'non approvato'
         else:
             return ''

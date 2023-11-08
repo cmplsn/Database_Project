@@ -1,5 +1,6 @@
 from sqlalchemy import *
 from sqlalchemy.orm import relationship
+import uuid
 
 from db import Base
 
@@ -7,10 +8,9 @@ from db import Base
 class File(Base):
     __tablename__ = 'FILE'
 
-    uuid = Column(UUID(as_uuid=True), primary_key=True)
+    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4())
     title = Column(String, nullable=False)
     projectuuid = Column("ProjectUuid", ForeignKey("PROJECT.uuid", ondelete='CASCADE'))
-    project = relationship("Project")
 
     def __init__(self, title: str, projectuuid: UUID, uuid: UUID = null):
         self.projectuuid = projectuuid
