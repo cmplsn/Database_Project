@@ -21,8 +21,9 @@ login_manager.init_app(app)
 # ip_ban = IpBan(ban_count=5)
 # ip_ban.init_app(app)
 
-print("ho iniziato exe app")
 testing()
+
+print("ho iniziato exe app")
 
 
 @login_manager.user_loader
