@@ -10,6 +10,7 @@ from classes.researcher import Researcher
 from classes.evaluators import Evaluator
 from classes.user import User
 from testing import testing
+from flask_security import *
 
 
 app = Flask(__name__)

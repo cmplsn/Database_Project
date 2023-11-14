@@ -13,8 +13,8 @@ class Researcher(User, UserMixin):
     password = Column(String, nullable=False)
     cv = Column(LargeBinary)
     project = relationship('Project', secondary=authors, back_populates='researchers')
-    # messages = relationship("Messages")
-    # versions = relationship("Versions")
+    messages = relationship("Messages")
+
 
     def __init__(self,  name: str, surname: str, email: str, password: str, cv: LargeBinary, dateofbirth: DateTime,
                  uuid: UUID = null):

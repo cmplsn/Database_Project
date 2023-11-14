@@ -1,5 +1,7 @@
 from datetime import datetime
 
+from sqlalchemy.orm import relationship
+
 from db import Base
 from sqlalchemy import *
 import uuid
@@ -12,14 +14,15 @@ class Messages(Base):
     object = Column(String, nullable=False)
     text = Column(Text, nullable=False)
     date = Column(DateTime(timezone=True), default=datetime.now(), nullable=False)
-    res = Column('ResearcherUuid', ForeignKey("RESEARCHERS.userUuid", ondelete='CASCADE'))
+    researcher = Column('ResearcherUuid', ForeignKey("RESEARCHERS.userUuid", ondelete='CASCADE'))
     project = Column('ProjectUuid', ForeignKey("PROJECT.uuid", ondelete='CASCADE'))
+    #res = relationship("Researcher")
 
-    def __init__(self, object: String, text: Text, date: DateTime, res: UUID, project: UUID, uuid: UUID=null ):
+    def __init__(self, object: String, text: Text, date: DateTime, researcher: UUID, project: UUID, uuid: UUID=null ):
         self.object = object
         self.text = text
         self. date = date
-        self.res = res
+        self.researcher = researcher
         self.project = project
 
         if uuid != null:

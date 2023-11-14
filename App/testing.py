@@ -70,10 +70,14 @@ def testing():
     adminSess.execute(delete(File))
     adminSess.execute(delete(Project))
     adminSess.commit()'''
-    res = adminSess.execute(select(Researcher.userUuid)).scalar()
+    '''res = adminSess.execute(select(Researcher.userUuid)).scalar()
     pro = adminSess.execute(select(Project.uuid)).scalar()
     mex = Messages('messaggio prova', "Buongiorno volevo chiederle se le va bene l'ultima consegna",
                    datetime.datetime.now(), res, pro)
     adminSess.add(mex)
-    adminSess.commit()
+    adminSess.commit()'''
 
+    '''stmt = select(Messages.text).where(Project.messages)
+    ret = adminSess.execute(stmt).scalars()
+    for row in ret:
+        print(row) '''

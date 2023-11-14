@@ -12,6 +12,8 @@ class File(Base):
     title = Column(String, nullable=False)
     projectuuid = Column("ProjectUuid", ForeignKey("PROJECT.uuid", ondelete='CASCADE'))
 
+    versions = relationship("Versions")
+
     def __init__(self, title: str, projectuuid: UUID, uuid: UUID = null):
         self.projectuuid = projectuuid
         self.title = title
