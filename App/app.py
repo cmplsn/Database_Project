@@ -10,7 +10,7 @@ from classes.researcher import Researcher
 from classes.evaluators import Evaluator
 from classes.user import User
 from testing import testing
-from flask_security import *
+
 
 
 app = Flask(__name__)
@@ -121,11 +121,11 @@ def private():
     return render_template("private.html")
 
 
-@app.route('/logout')
+@app.route('/logout', methods=['POST'])
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('home'))
+    return redirect(url_for('login'))
 
 
 if __name__ == '__main__':
