@@ -3,8 +3,10 @@ from datetime import timedelta
 
 from flask import *
 from flask_login import *
+from flask_security import Security
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import *
-from db import adminSess, resSess, evSess
+from db import adminSess, resSess, evSess, url_admin
 from classes.admin import Admin
 from classes.researcher import Researcher
 from classes.evaluators import Evaluator
@@ -14,14 +16,17 @@ from testing import testing
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'askh7-wur0z!'
+app.config['SQLALCHEMY_DATABASE_URI'] = url_admin
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+dbase = SQLAlchemy(app)
+app.security = Security(app)
 # todo: controllare cos'è
 # ip_ban = IpBan(ban_count=5)
 # ip_ban.init_app(app)
 
-testing()
+#testing()
 
 print("ho iniziato exe app")
 
