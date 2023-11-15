@@ -1,8 +1,6 @@
 import datetime
 import enum
 
-from flask_login import current_user
-
 from classes.admin import Admin
 from classes.user import User
 from classes.researcher import Researcher
@@ -12,14 +10,11 @@ from classes.project import Project, evaluations_enum
 from classes.file import File
 from sqlalchemy import *
 from db import adminSess
-from classes.versions import Versions
-from classes.report import Report
-from classes.messages import Messages
 
 
 def testing():
     # inserimento Admin,User, Researcher, Evaluator
-    '''adm = Admin('Alessandro','Campagnaro','cmplsn97@gmail.com', 'Abaco123!',
+    adm = Admin('Alessandro','Campagnaro','cmplsn97@gmail.com', 'Abaco123!',
                 dateofbirth=datetime.date(1997,10,22))
     res = Researcher('Gesù', 'Nazareno', 'gesunazareth@ciao.com', 'PadreFiglio33',
                      cv=open("pdf/CV - Campagnaro Alessandro.pdf",'rb').read(),
@@ -34,8 +29,6 @@ def testing():
 
     proj1 = Project("Prova Esempio", "descrizione prova esempio",
                     status=evaluations_enum.sottomessoperval)
-    proj2 = Project("PROVA", "descrizione prova esempio2",
-                    status=evaluations_enum.nonapprovato)
 
 
 
@@ -51,33 +44,7 @@ def testing():
     fileprova = File("prova", proj1.uuid)
     adminSess.add(fileprova)
     adminSess.commit()
-    vers = Versions("mi sono rotto lo stracazzo", submitdata=datetime.datetime.now(), version=3,
-                    file=open("pdf/CV - Campagnaro Alessandro.pdf", 'rb').read(), fileuuid=fileprova.uuid)
-    adminSess.add(vers)
-    adminSess.commit()'''
 
-    '''stmt = select(Versions.uuid)
-    versi = adminSess.execute(stmt).scalar()
-    ev = adminSess.execute(select(Evaluator.userUuid)).scalar()
-    print(ev)
-
-    rep = Report('descrizione a caso', eval=ev, vers=versi)
-    adminSess.add(rep)
-    adminSess.commit()'''
-
-
-    '''adminSess.execute(delete(User))
-    adminSess.execute(delete(File))
+    """adminSess.execute(delete(User))
     adminSess.execute(delete(Project))
-    adminSess.commit()'''
-    '''res = adminSess.execute(select(Researcher.userUuid)).scalar()
-    pro = adminSess.execute(select(Project.uuid)).scalar()
-    mex = Messages('messaggio prova', "Buongiorno volevo chiederle se le va bene l'ultima consegna",
-                   datetime.datetime.now(), res, pro)
-    adminSess.add(mex)
-    adminSess.commit()'''
-
-    '''stmt = select(Messages.text).where(Project.messages)
-    ret = adminSess.execute(stmt).scalars()
-    for row in ret:
-        print(row) '''
+    adminSess.commit()"""

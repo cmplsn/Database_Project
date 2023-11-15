@@ -12,7 +12,7 @@ class Evaluator(User, UserMixin):
     password = Column(String, nullable=False)
     cv = Column(LargeBinary)
 
-    report = relationship("Report")
+    # report = relationship("Report")
 
     def __init__(self, name: str, surname: str, email: str, password: str, cv: LargeBinary, dateofbirth: DateTime,
                  uuid: UUID = null):

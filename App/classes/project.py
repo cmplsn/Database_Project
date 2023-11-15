@@ -19,12 +19,9 @@ class Project(Base):
     title = Column(String, nullable=False)
     description = Column(Text)
     status = Column(Enum(evaluations_enum), nullable=False, default=evaluations_enum.sottomessoperval.name)
-
     researchers = relationship('Researcher', secondary=authors, back_populates="project")
-
-    messages = relationship("Messages")
-    file = relationship("File")
-
+    # files = relationship("File", backref="Project")
+    # messages = relationship("Messages")
 
     def __init__(self, title: str, description: Text, status: evaluations_enum, uuid: UUID = null):
         self.title = title
