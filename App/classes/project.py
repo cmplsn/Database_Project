@@ -2,7 +2,10 @@ from sqlalchemy.orm import relationship
 from db import Base
 from sqlalchemy import *
 from classes.authors import authors
-import enum, uuid
+import enum
+import uuid
+from classes.messages import Messages
+from classes.file import File
 
 
 class evaluations_enum(enum.Enum):  # todo: capire bene sta cosa degli enum come usarli sia qui che sul DB
@@ -20,8 +23,8 @@ class Project(Base):
     description = Column(Text)
     status = Column(Enum(evaluations_enum), nullable=False, default=evaluations_enum.sottomessoperval.name)
     researchers = relationship('Researcher', secondary=authors, back_populates="project")
-    # files = relationship("File", backref="Project")
-    # messages = relationship("Messages")
+    files = relationship(File, backref="Project")
+    messages = relationship(Messages)
 
     def __init__(self, title: str, description: Text, status: evaluations_enum, uuid: UUID = null):
         self.title = title
