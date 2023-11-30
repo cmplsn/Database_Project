@@ -10,8 +10,8 @@ from flask_smorest import *
 from sqlalchemy import *
 from db import *
 from models import *
-from App.resourches.Admin import admin_route
-from App.resourches.Researcher import res_route
+from resourches.Admin import admin_route
+from resourches.Researcher import res_route
 from testing import populate_database
 
 app = Flask(__name__)
@@ -67,7 +67,7 @@ def load_user(user_id):
 @app.route('/')
 def home():  # put application's code here
     print('sono entrato in home()')
-    return redirect(url_for('admin_route.admin'))
+    return redirect(url_for('res_route.res_private'))
 
 
 @app.route('/login', methods=['GET', 'POST'])

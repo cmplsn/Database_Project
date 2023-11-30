@@ -12,6 +12,7 @@ admin_route = Blueprint('admin_route', __name__)
 
 @admin_route.route('/admin', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def admin():
+    print(current_user.uuid + "ghe semo")
     if request.method == 'GET':
         column_names = ["Name", "Surname", "Email", "Date of Birth", "Remove"]
         data = adminSess.execute(

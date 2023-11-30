@@ -55,7 +55,7 @@ class Project(db.Model):
     uuid = Column(UUID(as_uuid=True), primary_key=True, server_default=db.text("uuid_generate_v4()"))
     title = Column(String, nullable=False)
     description = Column(Text)
-    status = Column(Enum(EvaluationsEnum), nullable=False)
+    status = Column(Enum(EvaluationsEnum), nullable=False, default=EvaluationsEnum.modificare)
 
 
 class Authors(db.Model):
