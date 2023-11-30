@@ -1,74 +1,75 @@
 import datetime
 import enum
 
-from classes.admin import Admin
-from classes.user import User
-from classes.researcher import Researcher
-from classes.evaluators import Evaluator
-from classes.authors import authors
-from classes.project import Project, evaluations_enum
-from classes.file import File
-from classes.versions import Versions
-from classes.messages import Messages
+from models import *
 from sqlalchemy import *
 from db import adminSess
 
 
-def testing():
-    '''adm = Admin('Alessandro','Campagnaro','cmplsn97@gmail.com', 'Abaco123!',
-                   dateofbirth=datetime.date(1997,10,22))
-    res = Researcher('Gesù', 'Nazareno', 'gesunazareth@ciao.com', 'PadreFiglio33',
-                        cv=open("pdf/CV - Campagnaro Alessandro.pdf",'rb').read(),
-                        dateofbirth=datetime.date(1900,12,25))
-    ev = Evaluator('Val', 'Utatore', 'val.ut@gmail.com','valuta666',
-                      cv=open("pdf/CV - Campagnaro Alessandro.pdf",'rb').read(),
-                      dateofbirth=datetime.date(1964,6,14))
-    adminSess.add(adm)
-    adminSess.add(ev)
+from datetime import datetime
 
-    # Inserimento PROJECT
+def populate_database(session: adminSess):
+    # Inserisci un utente
+    user0 = Users(name='Ghost', surname='User', email='no.morexisting@ghost.user', dateofbirth=datetime(2000, 10, 10))
+    user1 = Users(name='Ghost', surname='Admin', email='no.morexisting@ghost.admin', dateofbirth=datetime(2000, 1, 1))
+    user2 = Users(name='Ghost', surname='Evaluator', email='no.morexisting@ghost.evaluator', dateofbirth=datetime(2000, 2, 2))
+    user3 = Users(name='Ghost', surname='Researcher', email='no.morexisting@ghost.researcher', dateofbirth=datetime(2000, 3, 3))
+    user = Users(name='John', surname='Doe', email='john.doe@example.com', dateofbirth=datetime(1990, 1, 1))
+    session.add(user)
+    session.add(user0)
+    session.add(user1)
+    session.add(user2)
+    session.add(user3)
+    session.commit()
 
-    proj1 = Project("Prova Esempio", "descrizione prova esempio",
-                       status=evaluations_enum.sottomessoperval)
-    proj2 = Project("PROVA", "descrizione prova esempio2",
-                       status=evaluations_enum.nonapprovato)
+    # Inserisci un admin
+    admin = Admin(userUuid=user1.uuid, password='admin_password')
+    session.add(admin)
+    session.commit()
 
+    # Inserisci un ricercatore
+    researcher = Researchers(userUuid=user3.uuid, cv=b'cv_data', password='researcher_password')
+    session.add(researcher)
+    session.commit()
 
+    # Inserisci un valutatore
+    evaluator = Evaluator(userUuid=user2.uuid, password='evaluator_password', cv=b'cv_data')
+    session.add(evaluator)
+    session.commit()
 
-    # Inserimento AUTHOR
-    # res.project = [proj1]
-    proj1.researchers = [res]
-    adminSess.add(res)
-    adminSess.add(proj1)
-    adminSess.commit()
-    # proj1id = adminSess.execute(select(Project.uuid)).fetchone()
+    # Inserisci un progetto
+    project = Project(title='Sample Project', description='This is a sample project', status='approvato')
+    session.add(project)
+    session.commit()
 
-    #Inserimento FILE
-    fileprova = File("prova", proj1.uuid)
-    adminSess.add(fileprova)
-    adminSess.commit()
-    vers = Versions("mi sono rotto lo stracazzo", submitdata=datetime.datetime.now(), version=3,
-                       file=open("pdf/CV - Campagnaro Alessandro.pdf", 'rb').read(), fileuuid=fileprova.uuid)
-    adminSess.add(vers)
-    adminSess.commit()'''
+    # Inserisci un messaggio
+    message = Messages(object='Sample Message', text='This is a sample message', date=datetime.now(),
+                       ResearcherUuid=researcher.userUuid, ProjectUuid=project.uuid)
+    session.add(message)
+    session.commit()
 
-    '''rep = Report('descrizione a caso', eval=ev, vers=versi)
-    adminSess.add(rep)
-    adminSess.commit()'''
+    # Inserisci un file
+    file = File(title='Sample File', ProjectUuid=project.uuid)
+    session.add(file)
+    session.commit()
 
-    '''adminSess.execute(delete(User))
-    adminSess.execute(delete(File))
-    adminSess.execute(delete(Project))
-    adminSess.commit()'''
+    # Inserisci una versione
+    version = Versions(FileUuid=file.uuid, details='Sample Version', submitdate=datetime.now(), file=b'version_data', version=1)
+    session.add(version)
+    session.commit()
 
-    '''res = adminSess.execute(select(Researcher.userUuid)).scalar()
-    pro = adminSess.execute(select(Project.uuid)).scalar()
-    mex = Messages('messaggio prova', "Buongiorno volevo chiederle se le va bene l'ultima consegna",
-                   datetime.datetime.now(), res, pro)
-    adminSess.add(mex)
-    adminSess.commit()'''
+    # Inserisci un report
+    report = Report(EvaluatorUuid=evaluator.userUuid, VersionsUuid=version.uuid, description='Sample Report')
+    session.add(report)
+    session.commit()
 
-    '''stmt = select(Messages.text).where(Project.messages)
-    ret = adminSess.execute(stmt).scalars()
-    for row in ret:
-        print(row)'''
+    # Inserisci una relazione autore
+    author_relation = Authors(ResearcherUuid=researcher.userUuid, ProjectUuid=project.uuid)
+    session.add(author_relation)
+    session.commit()
+
+# Esempio di utilizzo
+# from your_flask_app import db, app
+# with app.app_context():
+#     db.create_all()
+#     populate_database(db.session)
