@@ -5,16 +5,16 @@ from flask import *
 from flask_login import *
 from sqlalchemy import *
 from App.models import *
-from App.db import resSess
+from App.db import resSess, adminSess
 
 res_route = Blueprint('res_route', __name__)
 
 
-@res_route.route('/res_private', methods=['GET', 'POST', 'DELETE', 'PUT'])
-def res_private():
+@res_route.route('/res_private<id>', methods=['GET', 'POST', 'DELETE', 'PUT'])
+def res_private(id):
     if request.method == 'GET':
-        column_names = ["Name", "Surname", "Email", "Date of Birth", "Remove"]
-        data = adminSess.execute(
+        column_names = ["Titolo", "Autori", "Status", "Remove"]
+        data = resSess.execute(
             select(Users.name, Users.surname, Users.email, Users.dateofbirth, Users.uuid).where(
                 Evaluator.userUuid == Users.uuid)).all()
         return render_template('HomeAdmin.html', column_names=column_names, data=data)

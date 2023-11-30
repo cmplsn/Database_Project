@@ -35,7 +35,7 @@ def admin():
                                  email=request.form['email'], dateofbirth=dateofbirth)
                 adminSess.add(new_user)
                 adminSess.commit()
-                new_eval = Evaluator(userUuid=new_user.uuid, password=request.form['password'], cv=request.form['cv'])
+                new_eval = Evaluator(userUuid=new_user.uuid, password=request.form['password'], cv=request.files['cv'].read())
                 adminSess.add(new_eval)
                 adminSess.commit()
             except Exception as e:
