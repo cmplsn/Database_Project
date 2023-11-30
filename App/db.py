@@ -1,7 +1,9 @@
+from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import *
 from sqlalchemy.orm import sessionmaker, declarative_base
 
 Base = declarative_base()
+
 
 # url per connessione database admin
 url_admin = URL.create('postgresql+psycopg',
@@ -38,4 +40,3 @@ engine_ev = create_engine(url_ev, echo=True,
                           execution_options={"schema_translate_map": {None: 'project_schema'}})
 evSess = sessionmaker(bind=engine_ev)
 evSess = evSess()
-
