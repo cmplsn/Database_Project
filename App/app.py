@@ -10,7 +10,7 @@ from flask_smorest import *
 from sqlalchemy import *
 from db import *
 from models import *
-from provadbmio.App.resourches.Admin import admin_route
+from App.resourches.Admin import admin_route
 from testing import populate_database
 
 app = Flask(__name__)
@@ -172,5 +172,5 @@ def init_database():
 
 if __name__ == '__main__':
     # init_database()
-    # populate_database(adminSess)
+    #populate_database(adminSess)
     app.run()

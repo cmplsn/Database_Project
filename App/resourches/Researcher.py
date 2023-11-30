@@ -4,8 +4,8 @@ import requests
 from flask import *
 from flask_login import *
 from sqlalchemy import *
-from provadbmio.App.models import *
-from provadbmio.App.db import resSess
+from App.models import *
+from App.db import resSess
 
 res_route = Blueprint('res_route', __name__)
 
