@@ -11,30 +11,14 @@ from datetime import datetime
 def populate_database(session: adminSess):
     # Inserisci un utente
     user0 = Users(name='Ghost', surname='User', email='no.morexisting@ghost.user', dateofbirth=datetime(2000, 10, 10))
-    user1 = Users(name='Ghost', surname='Admin', email='no.morexisting@ghost.admin', dateofbirth=datetime(2000, 1, 1))
-    user2 = Users(name='Ghost', surname='Evaluator', email='no.morexisting@ghost.evaluator', dateofbirth=datetime(2000, 2, 2))
-    user3 = Users(name='Ghost', surname='Researcher', email='no.morexisting@ghost.researcher', dateofbirth=datetime(2000, 3, 3))
-    user = Users(name='John', surname='Doe', email='john.doe@example.com', dateofbirth=datetime(1990, 1, 1))
-    session.add(user)
+    user1 = Admin(name='Ghost', surname='Admin', email='no.morexisting@ghost.admin', dateofbirth=datetime(2000, 1, 1), password='admin_password')
+    user2 = Evaluator(name='Ghost', surname='Evaluator', email='no.morexisting@ghost.evaluator', dateofbirth=datetime(2000, 2, 2), password='evaluator_password', cv=b'cv_data')
+    user3 = Researchers(name='Ghost', surname='Researcher', email='no.morexisting@ghost.researcher', dateofbirth=datetime(2000, 3, 3), cv=b'cv_data', password='researcher_password')
     session.add(user0)
+    session.commit()
     session.add(user1)
     session.add(user2)
     session.add(user3)
-    session.commit()
-
-    # Inserisci un admin
-    admin = Admin(userUuid=user1.uuid, password='admin_password')
-    session.add(admin)
-    session.commit()
-
-    # Inserisci un ricercatore
-    researcher = Researchers(userUuid=user3.uuid, cv=b'cv_data', password='researcher_password')
-    session.add(researcher)
-    session.commit()
-
-    # Inserisci un valutatore
-    evaluator = Evaluator(userUuid=user2.uuid, password='evaluator_password', cv=b'cv_data')
-    session.add(evaluator)
     session.commit()
 
     # Inserisci un progetto
@@ -43,7 +27,7 @@ def populate_database(session: adminSess):
     session.commit()
 
     # Inserisci un messaggio
-    message = Messages(object='Sample Message', text='This is a sample message', date=datetime.now(),
+    '''message = Messages(object='Sample Message', text='This is a sample message', date=datetime.now(),
                        ResearcherUuid=researcher.userUuid, ProjectUuid=project.uuid)
     session.add(message)
     session.commit()
@@ -72,4 +56,4 @@ def populate_database(session: adminSess):
 # from your_flask_app import db, app
 # with app.app_context():
 #     db.create_all()
-#     populate_database(db.session)
+#     populate_database(db.session)'''

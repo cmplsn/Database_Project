@@ -67,7 +67,7 @@ def load_user(user_id):
 @app.route('/')
 def home():  # put application's code here
     print('sono entrato in home()')
-    return redirect(url_for('res_route.res_private'))
+    return redirect(url_for('admin_route.admin'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -85,6 +85,7 @@ def login():
             if user is None:
                 return render_template('home.html', login_error=True)
             adm = adminSess.execute(select(Admin).where(Admin.userUuid == user[0].uuid)).fetchone()
+            print(adm)
             ev = evSess.execute(select(Evaluator).where(Evaluator.userUuid == user[0].uuid)).fetchone()
             res = resSess.execute(select(Researchers).where(Researchers.userUuid == user[0].uuid)).fetchone()
 
@@ -174,5 +175,5 @@ def init_database():
 
 if __name__ == '__main__':
     # init_database()
-    #populate_database(adminSess)
+    populate_database(adminSess)
     app.run()
