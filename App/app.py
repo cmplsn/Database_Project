@@ -10,7 +10,8 @@ from flask_smorest import *
 from sqlalchemy import *
 from db import *
 from models import *
-from App.resourches.Admin import admin_route
+from resourches.Admin import admin_route
+from resourches.Researcher import res_route
 from testing import populate_database
 
 app = Flask(__name__)
@@ -23,6 +24,7 @@ app.config['OPENAPI_SWAGGER_UI_PATH'] = "/swagger-ui"
 app.config['OPENAPI_SWAGGER_UI_URL'] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
 # app.config['SQLALCHEMY_DATABASE_URI'] = url_admin
 app.register_blueprint(admin_route)
+app.register_blueprint(res_route)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -83,6 +85,7 @@ def login():
             if user is None:
                 return render_template('home.html', login_error=True)
             adm = adminSess.execute(select(Admin).where(Admin.userUuid == user[0].uuid)).fetchone()
+            print(adm)
             ev = evSess.execute(select(Evaluator).where(Evaluator.userUuid == user[0].uuid)).fetchone()
             res = resSess.execute(select(Researchers).where(Researchers.userUuid == user[0].uuid)).fetchone()
 
@@ -91,7 +94,7 @@ def login():
                 print('ho trovato Admin in login')
                 if adm.Admin.auth_pwd(request.form['password']):
                     login_user(adm.Admin)
-                    return redirect(url_for('admin'))
+                    return redirect(url_for('admin_route.admin'))
                 else:
                     return render_template('home.html', login_error=True)
             elif ev is not None:
@@ -172,5 +175,5 @@ def init_database():
 
 if __name__ == '__main__':
     # init_database()
-    #populate_database(adminSess)
+    populate_database(adminSess)
     app.run()

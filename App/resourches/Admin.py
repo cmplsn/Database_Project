@@ -12,6 +12,7 @@ admin_route = Blueprint('admin_route', __name__)
 
 @admin_route.route('/admin', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def admin():
+
     if request.method == 'GET':
         column_names = ["Name", "Surname", "Email", "Date of Birth", "Remove"]
         data = adminSess.execute(
@@ -31,11 +32,8 @@ def admin():
         else:  # Aggiungi Evaluator
             try:
                 dateofbirth = datetime.strptime(request.form['dateofbirth'], '%Y-%m-%d')
-                new_user = Users(name=request.form['name'], surname=request.form['surname'],
-                                 email=request.form['email'], dateofbirth=dateofbirth)
-                adminSess.add(new_user)
-                adminSess.commit()
-                new_eval = Evaluator(userUuid=new_user.uuid, password=request.form['password'], cv=request.form['cv'])
+                new_eval = Evaluator(name=request.form['name'], surname=request.form['surname'],
+                                 email=request.form['email'], dateofbirth=dateofbirth, password=request.form['password'], cv=request.files['cv'].read())
                 adminSess.add(new_eval)
                 adminSess.commit()
             except Exception as e:

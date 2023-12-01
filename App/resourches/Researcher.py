@@ -5,40 +5,37 @@ from flask import *
 from flask_login import *
 from sqlalchemy import *
 from App.models import *
-from App.db import resSess
+from App.db import resSess, adminSess
 
 res_route = Blueprint('res_route', __name__)
 
 
 @res_route.route('/res_private', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def res_private():
-    if request.method == 'GET':
-        column_names = ["Name", "Surname", "Email", "Date of Birth", "Remove"]
-        data = adminSess.execute(
-            select(Users.name, Users.surname, Users.email, Users.dateofbirth, Users.uuid).where(
-                Evaluator.userUuid == Users.uuid)).all()
-        return render_template('HomeAdmin.html', column_names=column_names, data=data)
-    elif request.method == 'POST':
-        if request.form.get('action') == "rimuovi":  # Rimuovi Evaluator
-            try:
-                val_to_remove = request.form['rimuovi_val']
-                adminSess.execute(delete(Users).where(Users.uuid == val_to_remove))
-                adminSess.commit()
-            except Exception as e:
-                print(e)
-                evSess.rollback()
-            return redirect(url_for('admin_route.admin'))
-        else:  # Aggiungi Evaluator
-            try:
-                dateofbirth = datetime.strptime(request.form['dateofbirth'], '%Y-%m-%d')
-                new_user = Users(name=request.form['name'], surname=request.form['surname'],
-                                 email=request.form['email'], dateofbirth=dateofbirth)
-                adminSess.add(new_user)
-                adminSess.commit()
-                new_eval = Evaluator(userUuid=new_user.uuid, password=request.form['password'], cv=request.form['cv'])
-                adminSess.add(new_eval)
-                adminSess.commit()
-            except Exception as e:
-                print(e)
-                evSess.rollback()
-            return redirect(url_for('admin_route.admin'))
+    try:
+        print(current_user.uuid)
+        if request.method == 'GET':
+            column_names = ["Titolo", "Status", "Remove"]
+            open_projects = resSess.execute(
+                select(Project.title, Project.status).where(
+                    Researchers.userUuid == Authors.ResearcherUuid & (
+                                Project.uuid == Authors.ProjectUuid) & Project.status is not EvaluationsEnum.approvato)).all()
+            approved_projects = resSess.execute(
+                select(Project.title).where(
+                    Researchers.userUuid == Authors.ResearcherUuid & Project.uuid == Authors.ProjectUuid & Project.status is EvaluationsEnum.approvato)).all()
+            return render_template('HomeResearcher.html', column_names=column_names, open_projects=open_projects,
+                                   aproved_projects=approved_projects)
+        elif request.method == 'POST':
+            if request.form.get('action') == "elimina":  # Elimina progetto
+                prj_to_remove = request.form['elimina_project']
+                resSess.execute(delete(Project).where(Project.uuid == prj_to_remove))
+                resSess.commit()
+                return redirect(url_for('res_route.res_private'))
+            else:  # Aggiungi progetto
+                new_prj = Project(title=request.form['title'], description=request.form['description'])
+                resSess.add(new_prj)
+                resSess.commit()
+    except Exception as e:
+        print(e)
+        resSess.rollback()
+    return redirect(url_for('res_route.res_private'))
