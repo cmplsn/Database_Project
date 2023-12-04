@@ -13,18 +13,18 @@ res_route = Blueprint('res_route', __name__)
 @res_route.route('/res_private', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def res_private():
     try:
-        print(current_user.uuid)
         if request.method == 'GET':
-            column_names = ["Titolo", "Status", "Remove"]
+            column_names = ["Titolo", "Status"]
             open_projects = resSess.execute(
                 select(Project.title, Project.status).where(
-                    Researchers.userUuid == Authors.ResearcherUuid & (
-                                Project.uuid == Authors.ProjectUuid) & Project.status is not EvaluationsEnum.approvato)).all()
+                    current_user.userUuid == Authors.ResearcherUuid & (
+                            Project.uuid == Authors.ProjectUuid) & Project.status is not EvaluationsEnum.approvato)).all()
             approved_projects = resSess.execute(
                 select(Project.title).where(
-                    Researchers.userUuid == Authors.ResearcherUuid & Project.uuid == Authors.ProjectUuid & Project.status is EvaluationsEnum.approvato)).all()
-            return render_template('HomeResearcher.html', column_names=column_names, open_projects=open_projects,
-                                   aproved_projects=approved_projects)
+                    current_user.userUuid == Authors.ResearcherUuid & Project.uuid == Authors.ProjectUuid & Project.status is EvaluationsEnum.approvato)).all()
+            return render_template('HomeResearcher.html', user=current_user, column_names=column_names,
+                                   open_projects=open_projects,
+                                   approved_projects=approved_projects)
         elif request.method == 'POST':
             if request.form.get('action') == "elimina":  # Elimina progetto
                 prj_to_remove = request.form['elimina_project']

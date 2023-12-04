@@ -2,6 +2,8 @@ import enum
 
 import bcrypt
 import uuid
+
+from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, Enum, Date, DateTime, LargeBinary, null
 from sqlalchemy.orm import relationship
@@ -42,7 +44,7 @@ class Users(Base):
         return self.uuid
 
 
-class Admin(Users):
+class Admin(Users, UserMixin):
     __tablename__ = 'ADMIN'
     __table_args__ = {'extend_existing': True}
     userUuid = Column('userUuid', ForeignKey('USERS.uuid', ondelete='CASCADE'), primary_key=True)
@@ -68,10 +70,10 @@ class Admin(Users):
                 f"email:{self.email}, password='***', dateofbirt={self.dateofbirth},uuid={self.uuid})")
 
 
-class Researchers(Users):
+class Researchers(Users, UserMixin):
     __tablename__ = 'RESEARCHERS'
     __table_args__ = {'extend_existing': True}
-    userUuid = Column('userUuid', ForeignKey('USERS.uuid'), primary_key=True)
+    userUuid = Column('userUuid', ForeignKey('USERS.uuid', ondelete='CASCADE'), primary_key=True)
     password = Column(String, nullable=False)
     cv = Column(LargeBinary)
 
@@ -82,10 +84,10 @@ class Researchers(Users):
         self.cv = cv
 
 
-class Evaluator(Users):
+class Evaluator(Users, UserMixin):
     __tablename__ = 'EVALUATOR'
     __table_args__ = {'extend_existing': True}
-    userUuid = Column('userUuid', ForeignKey('USERS.uuid'), primary_key=True)
+    userUuid = Column('userUuid', ForeignKey('USERS.uuid', ondelete='CASCADE'), primary_key=True)
     password = Column(String, nullable=False)
     cv = Column(LargeBinary)
 
