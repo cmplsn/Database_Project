@@ -33,7 +33,7 @@ def admin():
             try:
                 dateofbirth = datetime.strptime(request.form['dateofbirth'], '%Y-%m-%d')
                 new_eval = Evaluators(name=request.form['name'], surname=request.form['surname'],
-                                 email=request.form['email'], dateofbirth=dateofbirth, password=request.form['password'], cv=request.files['cv'].read())
+                                 email=request.form['email'], birthdate=dateofbirth, password=request.form['password'], cv=request.files['cv'].read())
                 adminSess.add(new_eval)
                 adminSess.commit()
             except Exception as e:
