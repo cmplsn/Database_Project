@@ -11,14 +11,21 @@ from datetime import datetime
 def populate_database(session: adminSess):
     # Inserisci un utente
     user0 = Users(name='Ghost', surname='User', email='no.morexisting@ghost.user', dateofbirth=datetime(2000, 10, 10))
-    user1 = Admin(name='Ghost', surname='Admin', email='no.morexisting@ghost.admin', dateofbirth=datetime(2000, 1, 1), password='admin_password')
-    user2 = Evaluator(name='Ghost', surname='Evaluator', email='no.morexisting@ghost.evaluator', dateofbirth=datetime(2000, 2, 2), password='evaluator_password', cv=b'cv_data')
-    user3 = Researchers(name='Ghost', surname='Researcher', email='no.morexisting@ghost.researcher', dateofbirth=datetime(2000, 3, 3), cv=b'cv_data', password='researcher_password')
+    user1 = Users(name='Ghost', surname='Admin', email='no.morexisting@ghost.admin', dateofbirth=datetime(2000, 1, 1))
+    user2 = Users(name='Ghost', surname='Evaluator', email='no.morexisting@ghost.evaluator', dateofbirth=datetime(2000, 2, 2))
+    user3 = Users(name='Ghost', surname='Researcher', email='no.morexisting@ghost.researcher', dateofbirth=datetime(2000, 3, 3))
     session.add(user0)
     session.commit()
     session.add(user1)
     session.add(user2)
     session.add(user3)
+    session.commit()
+    admin = Admin(user1.uuid, password='admin_password')
+    res = Researchers(user3.uuid, cv=b'cv_data', password='researcher_password')
+    ev = Evaluator(user2.uuid, password='evaluator_password', cv=b'cv_data')
+    session.add(admin)
+    session.add(res)
+    session.add(ev)
     session.commit()
 
     # Inserisci un progetto

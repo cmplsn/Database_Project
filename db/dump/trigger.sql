@@ -1,6 +1,5 @@
 -- Definizione dei trigger
 SET search_path TO project_schema;
 
--- Quando viene eliminato un Evaluator viene posto nelle altre tabelle
--- a lui associate un Evaluator fantasma
-
+-- Creazione di Admin e degli utenti fantasma alla creazione del database
+-- Creazione della funzione che sarà chiamata dal trigger

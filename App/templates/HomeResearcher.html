@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Visualizzazione Evaluators</title>
+    <title>HomeResearcher</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -31,11 +32,11 @@
             display: flex;
             width: 100%;
             box-sizing: border-box;
-            justify-content: space-between; /* Modifica: sposta a destra il form di aggiunta */
+            justify-content: space-between;
         }
 
         table {
-            width: 100%; /* Modifica: centra la lista di valutatori */
+            width: 100%;
             text-align: center;
             border-collapse: collapse;
             margin-bottom: 20px;
@@ -63,58 +64,34 @@
             box-sizing: border-box;
         }
 
-        input[type="submit"], input[type="file"] {
+        input[type="submit"],
+        input[type="file"] {
             background-color: #007bff;
             color: #fff;
             cursor: pointer;
         }
-
-        /* Stili personalizzati per datepicker */
-        .datepicker {
-            font-family: 'Arial', sans-serif;
-            background-color: #fff;
-            border: 1px solid #ddd;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .datepicker--nav {
-            background-color: #007bff;
-            color: #fff;
-        }
-
-        .datepicker--cell {
-            color: #333;
-        }
-
-        .datepicker--cell:hover {
-            background-color: #007bff;
-            color: #fff;
-        }
-
-        .datepicker--cell-day {
-            padding: 10px;
-        }
     </style>
-    <!-- Includi il CSS di datepicker -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/datepicker.min.css">
 </head>
+
 <body>
     <header>
         <h1>Ciao user.name</h1>
     </header>
     <main>
         <div style="margin-left:20px">
-            <h2>Lista di Open Projects </h2>
+            <h2>Lista di Open Projects</h2>
             <table>
                 <thead>
                     <tr>
                         {% for column_name in column_names %}
                             <th>{{ column_name }}</th>
                         {% endfor %}
+                        <th>Remove</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for row in data %}
+                    {% for row in open_projects %}
                         <tr>
                             {% for value in row %}
                                 <td>{{ value }}</td>
@@ -130,48 +107,46 @@
                 </tbody>
             </table>
         </div>
+        <div style="margin-left:20px">
+            <h2>Lista di Approved Projects</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in approved_projects %}
+                        <tr>
+                            <td>{{ row.title }}</td>
+                            <td>
+                                <form action="{{ url_for('res_route.res_private') }}" method="post">
+                                    <input type="hidden" name="action" value="elimina">
+                                    <button type="submit" name="elimina_project" value="{{ row.uuid }}">Elimina</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         <div>
-            <h2>Add new Evaluator</h2>
-            <form method="post" enctype="multipart/form-data">
+            <h2>Add new Project</h2>
+            <form method="post">
                 <input type="hidden" name="action" value="aggiungi">
                 <div>
-                    <label for="name">Name:</label>
-                    <input name="name" type="text" id="name" required>
+                    <label for="title">Title:</label>
+                    <input name="title" type="text" id="title" required>
                 </div>
                 <div>
-                    <label for="surname">Surname:</label>
-                    <input name="surname" type="text" id="surname" required>
+                    <label for="description">Description:</label>
+                    <input name="description" type="text" id="description" required>
                 </div>
-                <div>
-                    <label for="dateofbirth">Date of Birth:</label>
-                    <input name="dateofbirth" type="text" id="dateofbirth" required>
-                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-                    <script src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/datepicker.min.js"></script>
-                    <script>
-                        $(document).ready(function(){
-                            $('#dateofbirth').datepicker({
-                                format: 'yyyy-mm-dd',
-                                autoHide: true
-                            });
-                        });
-                    </script>
-                </div>
-                <div>
-                    <label for="email">Email:</label>
-                    <input name="email" type="email" id="email" required>
-                </div>
-                <div>
-                    <label for="password">Password:</label>
-                    <input name="password" type="password" id="password" required>
-                </div>
-                <div>
-                    <label for="cv">Curriculum Vitae (PDF):</label> <!-- Modifica: Aggiunto campo per l'upload di file PDF -->
-                    <input type="file" name="cv" id="cv" accept=".pdf" required>
-                </div>
-
                 <input type="submit" value="Add">
             </form>
         </div>
     </main>
 </body>
+
 </html>
