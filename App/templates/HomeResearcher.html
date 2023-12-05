@@ -100,8 +100,8 @@
                     {% for row in open_projects %}
                         <tr>
                             {% for value in row %}
-                                {% if loop.index0 == 1 %}
-                                    <td><a href="{{ url_for('nome_pagina_di_destinazione', uuid=row.uuid) }}">{{ value }}</a></td>
+                                {% if loop.index0 == 0 %}
+                                    <td><a href="{{ url_for('prj_route.prj_private', uuid=row.uuid) }}">{{ value }}</a></td>
                                 {% else %}
                                     <td>{{ value }}</td>
                                 {% endif %}

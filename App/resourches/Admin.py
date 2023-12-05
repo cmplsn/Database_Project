@@ -16,8 +16,8 @@ def admin():
     if request.method == 'GET':
         column_names = ["Name", "Surname", "Email", "Date of Birth", "Remove"]
         data = adminSess.execute(
-            select(Users.name, Users.surname, Users.email, Users.dateofbirth, Users.uuid).where(
-                Evaluator.userUuid == Users.uuid)).all()
+            select(Users.name, Users.surname, Users.email, Users.birthdate, Users.uuid).where(
+                Evaluators.userUuid == Users.uuid)).all()
         return render_template('HomeAdmin.html', column_names=column_names, data=data)
     elif request.method == 'POST':
         if request.form.get('action') == "rimuovi":  # Rimuovi Evaluator
@@ -32,7 +32,7 @@ def admin():
         else:  # Aggiungi Evaluator
             try:
                 dateofbirth = datetime.strptime(request.form['dateofbirth'], '%Y-%m-%d')
-                new_eval = Evaluator(name=request.form['name'], surname=request.form['surname'],
+                new_eval = Evaluators(name=request.form['name'], surname=request.form['surname'],
                                  email=request.form['email'], dateofbirth=dateofbirth, password=request.form['password'], cv=request.files['cv'].read())
                 adminSess.add(new_eval)
                 adminSess.commit()

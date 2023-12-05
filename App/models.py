@@ -5,7 +5,7 @@ import uuid
 
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, ForeignKey, Integer, String, Text, Enum, Date, DateTime, LargeBinary, null
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, Enum, Date, DateTime, LargeBinary, null, Table
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from db import Base
@@ -21,38 +21,38 @@ class EvaluationsEnum(enum.Enum):  # todo: capire bene sta cosa degli enum come 
 
 
 class Users(db.Model):
-    __tablename__ = 'USERS'
+    __tablename__ = 'users'
     __table_args__ = {'extend_existing': True}
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = Column(String, nullable=False)
     surname = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
-    dateofbirth = Column(Date)
+    birthdate = Column(Date)
 
     def __init__(self, name: str, surname: str, email: str, dateofbirth: DateTime, uuid: UUID = null):
         self.name = name
         self.surname = surname
         self.email = email
-        self.dateofbirth = dateofbirth
+        self.birthdate = dateofbirth
         if uuid != null:
             self.uuid = uuid
 
     def __repr__(self):
         return f"User(uuid={self.uuid}, name='{self.name}', surname='{self.surname}', email='{self.email}'," \
-               f"dateofbirth = {self.dateofbirth}"
+               f"birthdate = {self.birthdate}"
 
     def get_id(self):
         return self.uuid
 
 
 class Admin(Users, UserMixin):
-    __tablename__ = 'ADMIN'
+    __tablename__ = 'admin'
     __table_args__ = {'extend_existing': True}
-    userUuid = Column('userUuid', ForeignKey('USERS.uuid', ondelete='CASCADE'), primary_key=True)
+    userUuid = Column('userUuid', ForeignKey('users.uuid', ondelete='CASCADE'), primary_key=True)
     password = Column(String, nullable=False)
 
-    def __init__(self, name: str, surname: str, email: str, password: str, dateofbirth: DateTime, uuid: UUID = null):
-        super().__init__(name, surname, email, dateofbirth, uuid)
+    def __init__(self, name: str, surname: str, email: str, password: str, birthdate: DateTime, uuid: UUID = null):
+        super().__init__(name, surname, email, birthdate, uuid)
         pwd = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         self.password = pwd.decode('utf-8')
         self.userUuid = self.uuid
@@ -65,23 +65,23 @@ class Admin(Users, UserMixin):
                 'name': super().name,
                 'surname': super().surname,
                 'email': super().email,
-                'dateofbirth': str(super().dateofbirth)}
+                'birthdate': str(super().birthdate)}
 
     def __repr__(self):
         return (f"Admin(userUuid:{self.userUuid},name = '{self.name}', surname='{self.surname}',"
-                f"email:{self.email}, password='***', dateofbirt={self.dateofbirth},uuid={self.uuid})")
+                f"email:{self.email}, password='***', birthdate={self.birthdate},uuid={self.uuid})")
 
 
 class Researchers(Users, UserMixin):
-    __tablename__ = 'RESEARCHERS'
+    __tablename__ = 'researchers'
     __table_args__ = {'extend_existing': True}
-    userUuid = Column('userUuid', ForeignKey('USERS.uuid', ondelete='CASCADE'), primary_key=True)
+    userUuid = Column('userUuid', ForeignKey('users.uuid', ondelete='CASCADE'), primary_key=True)
     password = Column(String, nullable=False)
     cv = Column(LargeBinary)
 
-    def __init__(self, name: str, surname: str, email: str, password: str, dateofbirth: DateTime, cv: LargeBinary,
+    def __init__(self, name: str, surname: str, email: str, password: str, birthdate: DateTime, cv: LargeBinary,
                  uuid: UUID = null):
-        super().__init__(name, surname, email, dateofbirth, uuid)
+        super().__init__(name, surname, email, birthdate, uuid)
         pwd = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         self.password = pwd.decode('utf-8')
         self.cv = cv
@@ -91,16 +91,16 @@ class Researchers(Users, UserMixin):
         return bcrypt.checkpw(pwd.encode('utf-8'), self.password.encode('utf-8'))
 
 
-class Evaluator(Users, UserMixin):
-    __tablename__ = 'EVALUATOR'
+class Evaluators(Users, UserMixin):
+    __tablename__ = 'evaluators'
     __table_args__ = {'extend_existing': True}
-    userUuid = Column('userUuid', ForeignKey('USERS.uuid', ondelete='CASCADE'), primary_key=True)
+    userUuid = Column('userUuid', ForeignKey('users.uuid', ondelete='CASCADE'), primary_key=True)
     password = Column(String, nullable=False)
     cv = Column(LargeBinary)
 
-    def __init__(self, name: str, surname: str, email: str, password: str, dateofbirth: DateTime, cv: LargeBinary,
+    def __init__(self, name: str, surname: str, email: str, password: str, birthdate: DateTime, cv: LargeBinary,
                  uuid: UUID = null):
-        super().__init__(name, surname, email, dateofbirth, uuid)
+        super().__init__(name, surname, email, birthdate, uuid)
         pwd = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         self.cv = cv
         self.password = pwd.decode('utf-8')
@@ -110,8 +110,8 @@ class Evaluator(Users, UserMixin):
         return bcrypt.checkpw(pwd.encode('utf-8'), self.password.encode('utf-8'))
 
 
-class Project(db.Model):
-    __tablename__ = 'PROJECT'
+class Projects(db.Model):
+    __tablename__ = 'projects'
     __table_args__ = {'extend_existing': True}
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String, nullable=False)
@@ -119,32 +119,22 @@ class Project(db.Model):
     status = Column(Enum(EvaluationsEnum), nullable=False, default=EvaluationsEnum.modificare)
 
 
-class Authors(db.Model):
-    __tablename__ = 'AUTHORS'
-    __table_args__ = {'extend_existing': True}
-    ResearcherUuid = Column(UUID(as_uuid=True), ForeignKey('RESEARCHERS.userUuid'), primary_key=True)
-    ProjectUuid = Column(UUID(as_uuid=True), ForeignKey('PROJECT.uuid'), primary_key=True)
-
-    researcher = relationship('Researchers')
-    project = relationship('Project')
-
-    def __init__(self, ResearcherUuid: uuid, ProjectUuid: uuid):
-        self.ResearcherUuid = ResearcherUuid
-        self.ProjectUuid = ProjectUuid
+Authors = Table('authors', Base.metadata,
+                Column('ProjectUuid', UUID, ForeignKey('projects.uuid'), primary_key=True),
+                Column('ResearcherUuid', UUID, ForeignKey('researchers.userUuid'), primary_key=True),
+                extend_existing=True
+                )
 
 
 class Messages(db.Model):
-    __tablename__ = 'MESSAGES'
+    __tablename__ = 'messages'
     __table_args__ = {'extend_existing': True}
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     object = Column(String, nullable=False)
     text = Column(Text)
     date = Column(DateTime)
-    ResearcherUuid = Column(UUID(as_uuid=True), ForeignKey('RESEARCHERS.userUuid'), nullable=False)
-    ProjectUuid = Column(UUID(as_uuid=True), ForeignKey('PROJECT.uuid'), nullable=False)
-
-    researcher = relationship('Researchers')
-    project = relationship('Project')
+    ResearcherUuid = Column(UUID(as_uuid=True), ForeignKey('researchers.userUuid'), nullable=False)
+    ProjectUuid = Column(UUID(as_uuid=True), ForeignKey('projects.uuid'), nullable=False)
 
     def __init__(self, object: String, text: Text, date: DateTime, ResearcherUuid: UUID, ProjectUuid: UUID,
                  uuid: UUID = null):
@@ -158,15 +148,13 @@ class Messages(db.Model):
             self.uuid = uuid
 
 
-class File(db.Model):
-    __tablename__ = 'FILE'
+class Files(db.Model):
+    __tablename__ = 'files'
     __table_args__ = {'extend_existing': True}
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String, nullable=False)
-    ProjectUuid = Column(UUID(as_uuid=True), ForeignKey('PROJECT.uuid'), nullable=False)
+    ProjectUuid = Column(UUID(as_uuid=True), ForeignKey('projects.uuid'), nullable=False)
 
-    project = relationship('Project')
-    versions = relationship("Versions", back_populates="file_data")
 
     def __init__(self, title: str, ProjectUuid: UUID, uuid: UUID = null):
         self.ProjectUuid = ProjectUuid
@@ -180,23 +168,21 @@ class File(db.Model):
 
 
 class Versions(db.Model):
-    __tablename__ = 'VERSIONS'
+    __tablename__ = 'versions'
     __table_args__ = {'extend_existing': True}
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    FileUuid = Column(UUID(as_uuid=True), ForeignKey('FILE.uuid', ondelete='CASCADE'))
+    FileUuid = Column(UUID(as_uuid=True), ForeignKey('files.uuid', ondelete='CASCADE'))
     details = Column(Text)
-    submitdate = Column(DateTime)
+    submitted = Column(DateTime)
     file = Column(LargeBinary)
     version = Column(Integer)
 
-    file_data = relationship('File', back_populates="versions",
-                             single_parent=True, cascade='all, delete-orphan')
 
-    def __init__(self, details: Text, submitdate: DateTime, version: Integer, file: LargeBinary, FileUuid: UUID,
+    def __init__(self, details: Text, submitted: DateTime, version: Integer, file: LargeBinary, FileUuid: UUID,
                  uuid: UUID = null):
         self.FileUuid = FileUuid
         self.details = details
-        self.submitdate = submitdate
+        self.submitted = submitted
         self.version = version
         self.file = file
 
@@ -204,16 +190,13 @@ class Versions(db.Model):
             self.uuid = uuid
 
 
-class Report(db.Model):
-    __tablename__ = 'REPORT'
+class Reports(db.Model):
+    __tablename__ = 'reports'
     __table_args__ = {'extend_existing': True}
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    EvaluatorUuid = Column(UUID(as_uuid=True), ForeignKey('EVALUATOR.userUuid'), nullable=False)
-    VersionsUuid = Column(UUID(as_uuid=True), ForeignKey('VERSIONS.uuid', ondelete='CASCADE'))
+    EvaluatorUuid = Column(UUID(as_uuid=True), ForeignKey('evaluators.userUuid'), nullable=False)
+    VersionsUuid = Column(UUID(as_uuid=True), ForeignKey('versions.uuid', ondelete='CASCADE'))
     description = Column(Text)
-
-    evaluator = relationship('Evaluator')
-    versions = relationship('Versions')
 
     def __init__(self, description: Text, EvaluatorUuid: UUID, VersionsUuid: UUID, uuid: UUID = null):
         self.description = description

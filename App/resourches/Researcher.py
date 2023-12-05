@@ -20,24 +20,24 @@ def res_private():
         if request.method == 'GET':
             column_names = ["Titolo", "Status"]
             open_projects = resSess.execute(
-                select(Project.title, Project.status).where(
+                select(Projects.title, Projects.status).where(
                     current_user.userUuid == Authors.ResearcherUuid and (
-                            Project.uuid == Authors.ProjectUuid) and (
-                                Project.status is not EvaluationsEnum.approvato))).all()
+                            Projects.uuid == Authors.ProjectUuid) and (
+                                Projects.status is not EvaluationsEnum.approvato))).all()
             approved_projects = resSess.execute(
-                select(Project.title).where(
-                    current_user.userUuid == Authors.ResearcherUuid and Project.uuid == Authors.ProjectUuid & Project.status is EvaluationsEnum.approvato)).all()
+                select(Projects.title).where(
+                    current_user.userUuid == Authors.ResearcherUuid and Projects.uuid == Authors.ProjectUuid & Projects.status is EvaluationsEnum.approvato)).all()
             return render_template('HomeResearcher.html', user_name=user.name, column_names=column_names,
                                    open_projects=open_projects,
                                    approved_projects=approved_projects, email_array=email_list)
         elif request.method == 'POST':
             if request.form.get('action') == "elimina":  # Elimina progetto
                 prj_to_remove = request.form['elimina_project']
-                resSess.execute(delete(Project).where(Project.uuid == prj_to_remove))
+                resSess.execute(delete(Projects).where(Projects.uuid == prj_to_remove))
                 resSess.commit()
                 return redirect(url_for('res_route.res_private'))
             elif request.form.get('action') == "aggiungi":  # Aggiungi progetto
-                new_prj = Project(title=request.form['title'], description=request.form['description'])
+                new_prj = Projects(title=request.form['title'], description=request.form['description'])
                 resSess.add(new_prj)
                 resSess.commit()
 
@@ -55,7 +55,7 @@ def res_private():
 
                 resSess.commit()
             elif request.form.get('action') == "submit_to_val":  # submit progetto
-                new_prj = Project(title=request.form['title'], description=request.form['description'])
+                new_prj = Projects(title=request.form['title'], description=request.form['description'])
                 resSess.add(new_prj)
                 resSess.commit()
     except Exception as e:

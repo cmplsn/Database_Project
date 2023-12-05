@@ -8,6 +8,8 @@ from flask_smorest import *
 # from flask_security import Security
 # from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import *
+
+from App.resourches.Project import prj_route
 from db import *
 from models import *
 from resourches.Admin import admin_route
@@ -25,6 +27,7 @@ app.config['OPENAPI_SWAGGER_UI_URL'] = "https://cdn.jsdelivr.net/npm/swagger-ui-
 # app.config['SQLALCHEMY_DATABASE_URI'] = url_admin
 app.register_blueprint(admin_route)
 app.register_blueprint(res_route)
+app.register_blueprint(prj_route)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -52,7 +55,7 @@ def load_user(user_id):
     user = evSess.execute(select(Users).where(Users.uuid == user_id)).fetchone()
 
     # todo: chiedere elia perchè messo user = teacherSession(...)
-    evaluator = evSess.execute(select(Evaluator).where(Evaluator.userUuid == user[0].uuid)).fetchone()
+    evaluator = evSess.execute(select(Evaluators).where(Evaluators.userUuid == user[0].uuid)).fetchone()
     if evaluator is None:
         researcher = resSess.execute(select(Researchers).where(Researchers.userUuid == user[0].uuid)).fetchone()
         if researcher is not None:
@@ -86,7 +89,7 @@ def login():
                 return render_template('home.html', login_error=True)
             adm = adminSess.execute(select(Admin).where(Admin.userUuid == user[0].uuid)).fetchone()
             print(adm)
-            ev = evSess.execute(select(Evaluator).where(Evaluator.userUuid == user[0].uuid)).fetchone()
+            ev = evSess.execute(select(Evaluators).where(Evaluators.userUuid == user[0].uuid)).fetchone()
             res = resSess.execute(select(Researchers).where(Researchers.userUuid == user[0].uuid)).fetchone()
 
             # Controlla se sta facendo login Admin
@@ -162,12 +165,12 @@ def init_database():
             adminSess.add(researcher0)
 
         for evaluator_data in Config.EVALUATOR_DATA:
-            evaluator0 = Evaluator(userUuid=adminSess.execute(select(Users).where(Users.surname == 'Evaluator')),
+            evaluator0 = Evaluators(userUuid=adminSess.execute(select(Users).where(Users.surname == 'Evaluator')),
                                    cv=evaluator_data[2], password=evaluator_data[1])
             adminSess.add(evaluator0)
 
         for project_data in Config.PROJECT_DATA:
-            project0 = Project(title=project_data[0], description=project_data[1], status=project_data[2])
+            project0 = Projects(title=project_data[0], description=project_data[1], status=project_data[2])
             adminSess.add(project0)
 
         adminSess.commit()
@@ -175,5 +178,5 @@ def init_database():
 
 if __name__ == '__main__':
     # init_database()
-    #populate_database()
+    populate_database()
     app.run()
