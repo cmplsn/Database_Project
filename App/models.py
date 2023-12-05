@@ -12,6 +12,7 @@ from db import Base
 
 db = SQLAlchemy()
 
+
 class EvaluationsEnum(enum.Enum):  # todo: capire bene sta cosa degli enum come usarli sia qui che sul DB
     approvato = 1
     sottomessoperval = 2
@@ -78,7 +79,8 @@ class Researchers(Users, UserMixin):
     password = Column(String, nullable=False)
     cv = Column(LargeBinary)
 
-    def __init__(self, name: str, surname: str, email: str, password: str, dateofbirth: DateTime, cv: LargeBinary, uuid: UUID = null):
+    def __init__(self, name: str, surname: str, email: str, password: str, dateofbirth: DateTime, cv: LargeBinary,
+                 uuid: UUID = null):
         super().__init__(name, surname, email, dateofbirth, uuid)
         pwd = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         self.password = pwd.decode('utf-8')
@@ -107,6 +109,7 @@ class Evaluator(Users, UserMixin):
     def auth_pwd(self, pwd: str):
         return bcrypt.checkpw(pwd.encode('utf-8'), self.password.encode('utf-8'))
 
+
 class Project(db.Model):
     __tablename__ = 'PROJECT'
     __table_args__ = {'extend_existing': True}
@@ -125,6 +128,10 @@ class Authors(db.Model):
     researcher = relationship('Researchers')
     project = relationship('Project')
 
+    def __init__(self, ResearcherUuid: uuid, ProjectUuid: uuid):
+        self.ResearcherUuid = ResearcherUuid
+        self.ProjectUuid = ProjectUuid
+
 
 class Messages(db.Model):
     __tablename__ = 'MESSAGES'
@@ -139,7 +146,8 @@ class Messages(db.Model):
     researcher = relationship('Researchers')
     project = relationship('Project')
 
-    def __init__(self, object: String, text: Text, date: DateTime, ResearcherUuid: UUID, ProjectUuid: UUID, uuid: UUID = null):
+    def __init__(self, object: String, text: Text, date: DateTime, ResearcherUuid: UUID, ProjectUuid: UUID,
+                 uuid: UUID = null):
         self.object = object
         self.text = text
         self.date = date
