@@ -8,20 +8,20 @@ from db import adminSess
 
 from datetime import datetime
 
-def populate_database(session: adminSess):
+def populate_database():
         # Create an admin user
-        admin_user = Admin(name='Admin', surname='User', email='admin@example.com', password='admin_password',
+        admin_user = Admin(name='Admin', surname='User', email='adm', password='pwd',
                            dateofbirth=datetime.now())
         adminSess.add(admin_user)
 
         # Create a researcher user
-        researcher_user = Researchers(name='Researcher', surname='User', email='researcher@example.com',
-                                      password='researcher_password', dateofbirth=datetime.now(), cv=b'cv_data')
+        researcher_user = Researchers(name='Researcher', surname='User', email='res',
+                                      password='pwd', dateofbirth=datetime.now(), cv=b'cv_data')
         adminSess.add(researcher_user)
 
         # Create an evaluator user
-        evaluator_user = Evaluator(name='Evaluator', surname='User', email='evaluator@example.com',
-                                   password='evaluator_password', dateofbirth=datetime.now(), cv=b'cv_data')
+        evaluator_user = Evaluator(name='Evaluator', surname='User', email='ev',
+                                   password='pwd', dateofbirth=datetime.now(), cv=b'cv_data')
         adminSess.add(evaluator_user)
 
         # Create a project

@@ -39,7 +39,7 @@ api = Api(app)
 
 
 print("ho iniziato exe app")
-
+#populate_database()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -56,7 +56,7 @@ def load_user(user_id):
     if evaluator is None:
         researcher = resSess.execute(select(Researchers).where(Researchers.userUuid == user[0].uuid)).fetchone()
         if researcher is not None:
-            return researcher.Researcher
+            return researcher[0]
     else:
         return evaluator.Evaluator
     print('finita riga 39 codice')

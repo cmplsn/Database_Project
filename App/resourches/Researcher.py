@@ -2,15 +2,16 @@ from datetime import datetime
 
 import requests
 from flask import *
-from flask_login import *
+from flask_login import current_user, login_required
 from sqlalchemy import *
 from App.models import *
 from App.db import resSess, adminSess
 
 res_route = Blueprint('res_route', __name__)
 
-@login_required
+
 @res_route.route('/res_private', methods=['GET', 'POST', 'DELETE', 'PUT'])
+@login_required
 def res_private():
     try:
         if request.method == 'GET':
@@ -42,4 +43,5 @@ def res_private():
     except Exception as e:
         print(e)
         resSess.rollback()
-    return redirect(url_for('res_route.res_private'))
+        return Response(status=500)     #500 = codice di errore
+    #return redirect(url_for('res_route.res_private'))
