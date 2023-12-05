@@ -67,7 +67,7 @@ def load_user(user_id):
 @app.route('/')
 def home():  # put application's code here
     print('sono entrato in home()')
-    return redirect(url_for('admin_route.admin'))
+    return redirect(url_for('login'))
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -108,11 +108,11 @@ def login():
                     return render_template('home.html', login_error=True)
             elif res is not None:
                 # controlla se login è di tipo Researcher
-                res = res.Researcher
+                res = res.Researchers
                 print('ho trovato researcher in login')
                 if res.auth_pwd(request.form['password']):
                     login_user(res)
-                    return redirect(url_for('private'))
+                    return redirect(url_for('res_route.res_private'))
                 else:
                     return render_template('home.html', login_error=True)
             else:
@@ -175,5 +175,5 @@ def init_database():
 
 if __name__ == '__main__':
     # init_database()
-    populate_database(adminSess)
+    #populate_database(adminSess)
     app.run()
