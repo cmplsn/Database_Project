@@ -19,7 +19,7 @@ class EvaluationsEnum(enum.Enum):  # todo: capire bene sta cosa degli enum come 
     nonapprovato = 4
 
 
-class Users(Base):
+class Users(db.Model):
     __tablename__ = 'USERS'
     __table_args__ = {'extend_existing': True}
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -54,6 +54,7 @@ class Admin(Users, UserMixin):
         super().__init__(name, surname, email, dateofbirth, uuid)
         pwd = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         self.password = pwd.decode('utf-8')
+        self.userUuid = self.uuid
 
     def auth_pwd(self, pwd: str):
         return bcrypt.checkpw(pwd.encode('utf-8'), self.password.encode('utf-8'))
@@ -82,6 +83,10 @@ class Researchers(Users, UserMixin):
         pwd = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         self.password = pwd.decode('utf-8')
         self.cv = cv
+        self.userUuid = self.uuid
+
+    def auth_pwd(self, pwd: str):
+        return bcrypt.checkpw(pwd.encode('utf-8'), self.password.encode('utf-8'))
 
 
 class Evaluator(Users, UserMixin):
@@ -97,12 +102,15 @@ class Evaluator(Users, UserMixin):
         pwd = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
         self.cv = cv
         self.password = pwd.decode('utf-8')
+        self.userUuid = self.uuid
 
+    def auth_pwd(self, pwd: str):
+        return bcrypt.checkpw(pwd.encode('utf-8'), self.password.encode('utf-8'))
 
 class Project(db.Model):
     __tablename__ = 'PROJECT'
     __table_args__ = {'extend_existing': True}
-    uuid = Column(UUID(as_uuid=True), primary_key=True, server_default=db.text("uuid_generate_v4()"))
+    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String, nullable=False)
     description = Column(Text)
     status = Column(Enum(EvaluationsEnum), nullable=False, default=EvaluationsEnum.modificare)
@@ -121,7 +129,7 @@ class Authors(db.Model):
 class Messages(db.Model):
     __tablename__ = 'MESSAGES'
     __table_args__ = {'extend_existing': True}
-    uuid = Column(UUID(as_uuid=True), primary_key=True, server_default=db.text("uuid_generate_v4()"))
+    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     object = Column(String, nullable=False)
     text = Column(Text)
     date = Column(DateTime)
@@ -131,12 +139,12 @@ class Messages(db.Model):
     researcher = relationship('Researchers')
     project = relationship('Project')
 
-    def __init__(self, object: String, text: Text, date: DateTime, res: UUID, project: UUID, uuid: UUID = null):
+    def __init__(self, object: String, text: Text, date: DateTime, ResearcherUuid: UUID, ProjectUuid: UUID, uuid: UUID = null):
         self.object = object
         self.text = text
         self.date = date
-        self.res = res
-        self.project = project
+        self.ResearcherUuid = ResearcherUuid
+        self.ProjectUuid = ProjectUuid
 
         if uuid != null:
             self.uuid = uuid
@@ -145,15 +153,15 @@ class Messages(db.Model):
 class File(db.Model):
     __tablename__ = 'FILE'
     __table_args__ = {'extend_existing': True}
-    uuid = Column(UUID(as_uuid=True), primary_key=True, server_default=db.text("uuid_generate_v4()"))
+    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String, nullable=False)
     ProjectUuid = Column(UUID(as_uuid=True), ForeignKey('PROJECT.uuid'), nullable=False)
 
     project = relationship('Project')
     versions = relationship("Versions", back_populates="file_data")
 
-    def __init__(self, title: str, projectuuid: UUID, uuid: UUID = null):
-        self.projectuuid = projectuuid
+    def __init__(self, title: str, ProjectUuid: UUID, uuid: UUID = null):
+        self.ProjectUuid = ProjectUuid
         self.title = title
 
         if uuid != null:
@@ -166,7 +174,7 @@ class File(db.Model):
 class Versions(db.Model):
     __tablename__ = 'VERSIONS'
     __table_args__ = {'extend_existing': True}
-    uuid = Column(UUID(as_uuid=True), primary_key=True, server_default=db.text("uuid_generate_v4()"))
+    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     FileUuid = Column(UUID(as_uuid=True), ForeignKey('FILE.uuid', ondelete='CASCADE'))
     details = Column(Text)
     submitdate = Column(DateTime)
@@ -176,11 +184,11 @@ class Versions(db.Model):
     file_data = relationship('File', back_populates="versions",
                              single_parent=True, cascade='all, delete-orphan')
 
-    def __init__(self, details: Text, submitdata: DateTime, version: Integer, file: LargeBinary, fileuuid: UUID,
+    def __init__(self, details: Text, submitdate: DateTime, version: Integer, file: LargeBinary, FileUuid: UUID,
                  uuid: UUID = null):
-        self.fileuuid = fileuuid
+        self.FileUuid = FileUuid
         self.details = details
-        self.submitdata = submitdata
+        self.submitdate = submitdate
         self.version = version
         self.file = file
 
@@ -191,7 +199,7 @@ class Versions(db.Model):
 class Report(db.Model):
     __tablename__ = 'REPORT'
     __table_args__ = {'extend_existing': True}
-    uuid = Column(UUID(as_uuid=True), primary_key=True, server_default=db.text("uuid_generate_v4()"))
+    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     EvaluatorUuid = Column(UUID(as_uuid=True), ForeignKey('EVALUATOR.userUuid'), nullable=False)
     VersionsUuid = Column(UUID(as_uuid=True), ForeignKey('VERSIONS.uuid', ondelete='CASCADE'))
     description = Column(Text)
@@ -199,10 +207,10 @@ class Report(db.Model):
     evaluator = relationship('Evaluator')
     versions = relationship('Versions')
 
-    def __init__(self, description: Text, eval: UUID, vers: UUID, uuid: UUID = null):
+    def __init__(self, description: Text, EvaluatorUuid: UUID, VersionsUuid: UUID, uuid: UUID = null):
         self.description = description
-        self.eval = eval
-        self.vers = vers
+        self.EvaluatorUuid = EvaluatorUuid
+        self.VersionsUuid = VersionsUuid
 
         if uuid != null:
             self.uuid = uuid

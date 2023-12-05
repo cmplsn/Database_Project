@@ -9,58 +9,48 @@ from db import adminSess
 from datetime import datetime
 
 def populate_database(session: adminSess):
-    # Inserisci un utente
-    user0 = Users(name='Ghost', surname='User', email='no.morexisting@ghost.user', dateofbirth=datetime(2000, 10, 10))
-    user1 = Users(name='Ghost', surname='Admin', email='no.morexisting@ghost.admin', dateofbirth=datetime(2000, 1, 1))
-    user2 = Users(name='Ghost', surname='Evaluator', email='no.morexisting@ghost.evaluator', dateofbirth=datetime(2000, 2, 2))
-    user3 = Users(name='Ghost', surname='Researcher', email='no.morexisting@ghost.researcher', dateofbirth=datetime(2000, 3, 3))
-    session.add(user0)
-    session.commit()
-    session.add(user1)
-    session.add(user2)
-    session.add(user3)
-    session.commit()
-    admin = Admin(user1.uuid, password='admin_password')
-    res = Researchers(user3.uuid, cv=b'cv_data', password='researcher_password')
-    ev = Evaluator(user2.uuid, password='evaluator_password', cv=b'cv_data')
-    session.add(admin)
-    session.add(res)
-    session.add(ev)
-    session.commit()
+        # Create an admin user
+        admin_user = Admin(name='Admin', surname='User', email='admin@example.com', password='admin_password',
+                           dateofbirth=datetime.now())
+        adminSess.add(admin_user)
 
-    # Inserisci un progetto
-    project = Project(title='Sample Project', description='This is a sample project', status='approvato')
-    session.add(project)
-    session.commit()
+        # Create a researcher user
+        researcher_user = Researchers(name='Researcher', surname='User', email='researcher@example.com',
+                                      password='researcher_password', dateofbirth=datetime.now(), cv=b'cv_data')
+        adminSess.add(researcher_user)
 
-    # Inserisci un messaggio
-    '''message = Messages(object='Sample Message', text='This is a sample message', date=datetime.now(),
-                       ResearcherUuid=researcher.userUuid, ProjectUuid=project.uuid)
-    session.add(message)
-    session.commit()
+        # Create an evaluator user
+        evaluator_user = Evaluator(name='Evaluator', surname='User', email='evaluator@example.com',
+                                   password='evaluator_password', dateofbirth=datetime.now(), cv=b'cv_data')
+        adminSess.add(evaluator_user)
 
-    # Inserisci un file
-    file = File(title='Sample File', ProjectUuid=project.uuid)
-    session.add(file)
-    session.commit()
+        # Create a project
+        '''project = Project(title='Sample Project', description='This is a sample project', status='approvato')
+        adminSess.add(project)'''
 
-    # Inserisci una versione
-    version = Versions(FileUuid=file.uuid, details='Sample Version', submitdate=datetime.now(), file=b'version_data', version=1)
-    session.add(version)
-    session.commit()
+        # Create an author association between researcher and project
+        '''author_association = Authors(ResearcherUuid=researcher_user.uuid, ProjectUuid=project.uuid)
+        adminSess.add(author_association)'''
 
-    # Inserisci un report
-    report = Report(EvaluatorUuid=evaluator.userUuid, VersionsUuid=version.uuid, description='Sample Report')
-    session.add(report)
-    session.commit()
+        # Create a message related to the project
+        '''message = Messages(object='Sample Message', text='This is a sample message', date=datetime.now(),
+                           ResearcherUuid=researcher_user.uuid, ProjectUuid=project.uuid)
+        adminSess.add(message)
 
-    # Inserisci una relazione autore
-    author_relation = Authors(ResearcherUuid=researcher.userUuid, ProjectUuid=project.uuid)
-    session.add(author_relation)
-    session.commit()
+        # Create a file related to the project
+        file_data = File(title='Sample File', ProjectUuid=project.uuid)
+        adminSess.add(file_data)'''
 
-# Esempio di utilizzo
-# from your_flask_app import db, app
-# with app.app_context():
-#     db.create_all()
-#     populate_database(db.session)'''
+        # Create a version related to the file
+        '''version = Versions(details='Version 1', submitdate=datetime.now(), version=1, file=b'version_data',
+                           FileUuid=file_data.uuid)
+        adminSess.add(version)'''
+
+        # Create a report related to the evaluator and version
+        '''report = Report(description='Sample Report', EvaluatorUuid=evaluator_user.userUuid, VersionsUuid=version.uuid)
+        adminSess.add(report)'''
+
+        # Commit the changes to the database
+        adminSess.commit()
+
+        print("Testing data inserted successfully.")

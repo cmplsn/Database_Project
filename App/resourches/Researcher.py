@@ -9,7 +9,7 @@ from App.db import resSess, adminSess
 
 res_route = Blueprint('res_route', __name__)
 
-
+@login_required
 @res_route.route('/res_private', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def res_private():
     try:
@@ -31,7 +31,11 @@ def res_private():
                 resSess.execute(delete(Project).where(Project.uuid == prj_to_remove))
                 resSess.commit()
                 return redirect(url_for('res_route.res_private'))
-            else:  # Aggiungi progetto
+            elif request.form.get('action') == "aggiungi":  # Aggiungi progetto
+                new_prj = Project(title=request.form['title'], description=request.form['description'])
+                resSess.add(new_prj)
+                resSess.commit()
+            elif request.form.get('action') == "submit_to_val":  # submit progetto
                 new_prj = Project(title=request.form['title'], description=request.form['description'])
                 resSess.add(new_prj)
                 resSess.commit()
