@@ -83,7 +83,7 @@ CREATE TABLE "versions"
     "uuid"             UUID DEFAULT uuid_generate_v4(),
     "FileUuid"         UUID NOT NULL,
     "details"          TEXT,
-    "submitted"        TIMESTAMP,
+    "submitted"        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     "file"             BYTEA,
     "version"          INTEGER,
     PRIMARY KEY ("uuid"),
@@ -96,6 +96,7 @@ CREATE TABLE "reports"
     "EvaluatorUuid"   UUID NOT NULL,
     "VersionsUuid"    UUID NOT NULL,
     "description"     TEXT,
+    "submitted"        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("uuid", "EvaluatorUuid", "VersionsUuid"),
     FOREIGN KEY ("EvaluatorUuid") REFERENCES "evaluators" ("userUuid") ON DELETE CASCADE,
     FOREIGN KEY ("VersionsUuid") REFERENCES "versions" ("uuid") ON DELETE CASCADE
