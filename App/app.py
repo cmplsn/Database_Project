@@ -1,5 +1,4 @@
 from datetime import timedelta, date, datetime
-
 import requests.cookies
 from flask import *
 from flask_login import *
@@ -8,8 +7,9 @@ from flask_smorest import *
 # from flask_security import Security
 # from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import *
-from db import *
-from models import *
+from resourches.Project import prj_route
+from App.db import *
+from App.models import *
 from resourches.Admin import admin_route
 from resourches.Researcher import res_route
 from testing import populate_database
@@ -25,6 +25,7 @@ app.config['OPENAPI_SWAGGER_UI_URL'] = "https://cdn.jsdelivr.net/npm/swagger-ui-
 # app.config['SQLALCHEMY_DATABASE_URI'] = url_admin
 app.register_blueprint(admin_route)
 app.register_blueprint(res_route)
+app.register_blueprint(prj_route)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -39,7 +40,7 @@ api = Api(app)
 
 
 print("ho iniziato exe app")
-
+#populate_database()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -49,14 +50,14 @@ def load_user(user_id):
         print('ho trovato Admin')
         return admin.Admin
 
-    user = evSess.execute(select(Users).where(Users.uuid == user_id)).fetchone()
+    user = evSess.execute(select(User).where(User.uuid == user_id)).fetchone()
 
     # todo: chiedere elia perchè messo user = teacherSession(...)
     evaluator = evSess.execute(select(Evaluator).where(Evaluator.userUuid == user[0].uuid)).fetchone()
     if evaluator is None:
-        researcher = resSess.execute(select(Researchers).where(Researchers.userUuid == user[0].uuid)).fetchone()
+        researcher = resSess.execute(select(Researcher).where(Researcher.userUuid == user[0].uuid)).fetchone()
         if researcher is not None:
-            return researcher.Researcher
+            return researcher[0]
     else:
         return evaluator.Evaluator
     print('finita riga 39 codice')
@@ -74,20 +75,20 @@ def home():  # put application's code here
 def login():
     print('sono entrato in login()')
     # settato la chiusura della sessione dopo tempo max 5 minuti
-    session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=5)
+    #session.permanent = True
+    #app.permanent_session_lifetime = timedelta(minutes=5)
 
     # riconosco metodo di richiesto come POST dal form html
     if request.method == 'POST':
         try:
             # Verifica se User è presente in db "USER"
-            user = evSess.execute(select(Users).where(Users.email == request.form['email'])).fetchone()
+            user = evSess.execute(select(User).where(User.email == request.form['email'])).fetchone()
             if user is None:
                 return render_template('home.html', login_error=True)
             adm = adminSess.execute(select(Admin).where(Admin.userUuid == user[0].uuid)).fetchone()
             print(adm)
             ev = evSess.execute(select(Evaluator).where(Evaluator.userUuid == user[0].uuid)).fetchone()
-            res = resSess.execute(select(Researchers).where(Researchers.userUuid == user[0].uuid)).fetchone()
+            res = resSess.execute(select(Researcher).where(Researcher.userUuid == user[0].uuid)).fetchone()
 
             # Controlla se sta facendo login Admin
             if adm is not None:
@@ -108,7 +109,7 @@ def login():
                     return render_template('home.html', login_error=True)
             elif res is not None:
                 # controlla se login è di tipo Researcher
-                res = res.Researchers
+                res = res.Researcher
                 print('ho trovato researcher in login')
                 if res.auth_pwd(request.form['password']):
                     login_user(res)
@@ -147,22 +148,22 @@ def init_database():
     with app.app_context():
 
         for user_data in Config.USERS_DATA:
-            users = Users(name=user_data[0], surname=user_data[1], email=user_data[2], dateofbirth=user_data[3])
+            users = User(name=user_data[0], surname=user_data[1], email=user_data[2], dateofbirth=user_data[3])
             adminSess.add(users)
         adminSess.commit()
 
         for admin_data in Config.ADMIN_DATA:
-            admin0 = Admin(userUuid=adminSess.execute(select(Users).where(Users.surname == 'Admin')),
+            admin0 = Admin(userUuid=adminSess.execute(select(User).where(User.surname == 'Admin')),
                            password=admin_data[0])
             adminSess.add(admin0)
 
         for researcher_data in Config.RESEARCHERS_DATA:
-            researcher0 = Researchers(userUuid=adminSess.execute(select(Users).where(Users.surname == 'Researcher')),
-                                      cv=researcher_data[2], password=researcher_data[1])
+            researcher0 = Researcher(userUuid=adminSess.execute(select(User).where(User.surname == 'Researcher')),
+                                     cv=researcher_data[2], password=researcher_data[1])
             adminSess.add(researcher0)
 
         for evaluator_data in Config.EVALUATOR_DATA:
-            evaluator0 = Evaluator(userUuid=adminSess.execute(select(Users).where(Users.surname == 'Evaluator')),
+            evaluator0 = Evaluator(userUuid=adminSess.execute(select(User).where(User.surname == 'Evaluator')),
                                    cv=evaluator_data[2], password=evaluator_data[1])
             adminSess.add(evaluator0)
 
@@ -175,5 +176,5 @@ def init_database():
 
 if __name__ == '__main__':
     # init_database()
-    #populate_database(adminSess)
+    #populate_database()
     app.run()

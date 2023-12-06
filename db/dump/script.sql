@@ -8,151 +8,141 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
 -- Definizione dello schema del database
 
-create table "USERS"
+CREATE TABLE "users"
 (
-    uuid        uuid default uuid_generate_v4() not null
-        primary key,
-    name        varchar                                        not null,
-    surname     varchar                                        not null,
-    email       varchar                                        not null
-        unique,
-    dateofbirth date
+    "uuid"        UUID DEFAULT uuid_generate_v4(),
+    "name"        VARCHAR NOT NULL,
+    "surname"     VARCHAR NOT NULL,
+    "email"       VARCHAR NOT NULL UNIQUE,
+    "birthdate"   DATE NOT NULL,
+    PRIMARY KEY ("uuid")
+
 );
 
-create table "ADMIN"
+CREATE TABLE "admin"
 (
-    "userUuid" uuid    not null
-        primary key
-        references "USERS"
-            on delete cascade,
-    password   varchar not null
+    "userUuid"   UUID,
+    "password"   VARCHAR NOT NULL,
+    PRIMARY KEY ("userUuid"),
+    FOREIGN KEY ("userUuid") REFERENCES "users" ("uuid") ON DELETE CASCADE
 );
 
-create table "RESEARCHERS"
+CREATE TABLE "researchers"
 (
-    "userUuid" uuid    not null
-        primary key
-        references "USERS"
-            on delete cascade,
-    cv         bytea,
-    password   varchar not null
+    "userUuid"   UUID,
+    "password"   VARCHAR NOT NULL,
+    "cv"         BYTEA,
+    PRIMARY KEY ("userUuid"),
+    FOREIGN KEY ("userUuid") REFERENCES "users" ("uuid") ON DELETE CASCADE
 );
 
-create table "EVALUATOR"
+CREATE TABLE "evaluators"
 (
-    "userUuid" uuid    not null
-        primary key
-        references "USERS"
-            on delete cascade,
-    password   varchar not null,
-    cv         bytea
+    "userUuid"   UUID,
+    "password"   VARCHAR NOT NULL,
+    "cv"         BYTEA,
+    PRIMARY KEY ("userUuid"),
+    FOREIGN KEY ("userUuid") REFERENCES "users" ("uuid") ON DELETE CASCADE
 );
 
-create type evaluations_enum as enum ('approvato', 'sottomessoperval', 'modificare', 'nonapprovato');
+CREATE TYPE evaluations_enum AS ENUM ('approvato', 'sottomessoperval', 'modificare', 'nonapprovato');
 
-create table "PROJECT"
+CREATE TABLE "projects"
 (
-    uuid        uuid default uuid_generate_v4() not null
-        primary key,
-    title       varchar                                        not null,
-    description text,
-    status      evaluations_enum                not null
+    "uuid"        UUID DEFAULT uuid_generate_v4(),
+    "title"       VARCHAR NOT NULL,
+    "description" TEXT,
+    "status"      evaluations_enum DEFAULT 'modificare',
+    PRIMARY KEY ("uuid")
 );
 
-create table "MESSAGES"
+CREATE TABLE "messages"
 (
-    uuid             uuid default uuid_generate_v4() not null
-        primary key,
-    object           varchar                                        not null,
-    text             text,
-    date             timestamp,
-    "ResearcherUuid" uuid                                           not null
-        references "RESEARCHERS",
-    "ProjectUuid"    uuid                                           not null
-        references "PROJECT"
+    "uuid"             UUID DEFAULT uuid_generate_v4(),
+    "object"           VARCHAR NOT NULL,
+    "text"             TEXT,
+    "date"             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "ResearcherUuid"   UUID,
+    "ProjectUuid"      UUID,
+    PRIMARY KEY ("uuid", "ResearcherUuid", "ProjectUuid"),
+    FOREIGN KEY ("ResearcherUuid") REFERENCES "researchers" ("userUuid") ON DELETE CASCADE,
+    FOREIGN KEY ("ProjectUuid") REFERENCES "projects" ("uuid") ON DELETE CASCADE
 );
 
-create table "FILE"
+CREATE TABLE "files"
 (
-    uuid          uuid default uuid_generate_v4() not null
-        primary key,
-    title         varchar                                        not null,
-    "ProjectUuid" uuid                                           not null
-        references "PROJECT"
+    "uuid"          UUID DEFAULT uuid_generate_v4(),
+    "title"         VARCHAR NOT NULL,
+    "ProjectUuid"   UUID NOT NULL,
+    PRIMARY KEY ("uuid"),
+    FOREIGN KEY ("ProjectUuid") REFERENCES "projects" ("uuid") ON DELETE CASCADE
 );
 
-create table "VERSIONS"
+CREATE TABLE "versions"
 (
-    uuid             uuid default uuid_generate_v4() not null
-        primary key,
-    "FileUuid"       uuid
-        references "FILE"
-            on delete cascade,
-    details          text,
-    "submitdate" timestamp,
-    file             bytea,
-    version          integer
+    "uuid"             UUID DEFAULT uuid_generate_v4(),
+    "FileUuid"         UUID NOT NULL,
+    "details"          TEXT,
+    "submitted"        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "file"             BYTEA,
+    "version"          INTEGER,
+    PRIMARY KEY ("uuid"),
+    FOREIGN KEY ("FileUuid") REFERENCES "files" ("uuid") ON DELETE CASCADE
 );
 
-create table "REPORT"
+CREATE TABLE "reports"
 (
-    uuid            uuid default uuid_generate_v4() not null
-        primary key,
-    "EvaluatorUuid" uuid
-        references "EVALUATOR"
-            on delete cascade,
-    "VersionsUuid"  uuid
-        references "VERSIONS"
-            on delete cascade,
-    description     text
+    "uuid"            UUID DEFAULT uuid_generate_v4(),
+    "EvaluatorUuid"   UUID NOT NULL,
+    "VersionsUuid"    UUID NOT NULL,
+    "description"     TEXT,
+    "submitted"        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY ("uuid", "EvaluatorUuid", "VersionsUuid"),
+    FOREIGN KEY ("EvaluatorUuid") REFERENCES "evaluators" ("userUuid") ON DELETE CASCADE,
+    FOREIGN KEY ("VersionsUuid") REFERENCES "versions" ("uuid") ON DELETE CASCADE
 );
 
-create table "AUTHORS"
+-- Tabella di associazione tra ricercatori e progetti --
+CREATE TABLE "authors"
 (
-    "ResearcherUuid" uuid not null
-        constraint "ResearcherProjectAssociations_ResearcherUuid_fkey"
-            references "RESEARCHERS"
-            on delete cascade,
-    "ProjectUuid"    uuid not null
-        constraint "ResearcherProjectAssociations_ProjectUuid_fkey"
-            references "PROJECT"
-            on delete cascade,
-    constraint "ResearcherProjectAssociations_pkey"
-        primary key ("ResearcherUuid", "ProjectUuid")
+    "ResearcherUuid" UUID,
+    "ProjectUuid"    UUID,
+    PRIMARY KEY ("ResearcherUuid", "ProjectUuid"),
+    FOREIGN KEY ("ResearcherUuid") REFERENCES "researchers" ("userUuid") ON DELETE CASCADE,
+    FOREIGN KEY ("ProjectUuid") REFERENCES "projects" ("uuid") ON DELETE CASCADE
 );
 
 
 -- Definizione dei ruoli: admin_role, ev_role, res_role
 SET search_path TO project_schema;
-create role ev_role;
-create role admin_role
-    superuser;
-create role res_role;
+CREATE ROLE ev_role;
+CREATE ROLE admin_role SUPERUSER;
+CREATE ROLE res_role;
 
 
 -- Definizione di user:
-create user admin_user with password 'pwd';
-create user ev_user with password 'pwd';
-create user res_user with password 'pwd';
+CREATE USER admin_user WITH PASSWORD 'pwd';
+CREATE USER ev_user WITH PASSWORD 'pwd';
+CREATE USER res_user WITH PASSWORD 'pwd';
 
-grant admin_role to admin_user;
-grant ev_role to ev_user;
-grant res_role to res_user;
+GRANT admin_role TO admin_user;
+GRANT ev_role TO ev_user;
+GRANT res_role TO res_user;
 
 
--- Definizione delle grant sulle tabelle:
+-- Definizione delle GRANT sulle tabelle:
 ---admin_role:
-grant all on all tables in schema project_schema to admin_role;
-grant usage on schema project_schema to admin_role;
+GRANT ALL ON ALL TABLES IN SCHEMA project_schema TO admin_role;
+GRANT USAGE ON SCHEMA project_schema TO admin_role;
 
 ---ev_role:
-grant insert, select on "VERSIONS", "MESSAGES" to ev_role;
-grant select on "AUTHORS", "FILE", "RESEARCHERS" to ev_role;
-grant insert, select, update on "USERS", "PROJECT", "EVALUATOR", "REPORT" to ev_role;
-grant usage on schema project_schema to ev_role;
+GRANT INSERT, SELECT  ON "versions", "messages" TO ev_role;
+GRANT SELECT  ON "authors", "files", "researchers" TO ev_role;
+GRANT INSERT, SELECT , UPDATE ON "users", "projects", "evaluators", "reports" TO ev_role;
+GRANT USAGE ON SCHEMA project_schema TO ev_role;
 
 ---res_role:
-grant select on "REPORT", "EVALUATOR" to res_role;
-grant insert, select on "MESSAGES", "AUTHORS", "FILE" to res_role;
-grant insert, select, update on "RESEARCHERS", "PROJECT", "USERS", "VERSIONS" to res_role;
-grant usage on schema project_schema to res_role;
+GRANT SELECT  ON "reports", "evaluators" TO res_role;
+GRANT INSERT, SELECT  ON "messages", "authors", "files" TO res_role;
+GRANT INSERT, SELECT , UPDATE ON "researchers", "projects", "users", "versions" TO res_role;
+GRANT USAGE ON SCHEMA project_schema TO res_role;

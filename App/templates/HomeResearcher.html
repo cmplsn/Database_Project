@@ -35,13 +35,6 @@
             justify-content: space-between;
         }
 
-        table {
-            width: 100%;
-            text-align: center;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
         form {
             background-color: #fff;
             padding: 20px;
@@ -65,72 +58,56 @@
         }
 
         input[type="submit"],
-        input[type="file"] {
+        input[type="file"],
+        button {
             background-color: #007bff;
             color: #fff;
             cursor: pointer;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .email-input {
+            display: flex;
+            margin-bottom: 8px;
+        }
+
+        .remove-email {
+            margin-left: 8px;
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/datepicker.min.css">
 </head>
 
 <body>
     <header>
-        <h1>Ciao user.name</h1>
+        <h1>Ciao {{ user_name }}</h1>
     </header>
     <main>
-<div style="margin-left:20px">
-    <h2>Lista di Open Projects</h2>
-    <table>
-        <thead>
-            <tr>
-                {% for column_name in column_names %}
-                    <th>{{ column_name }}</th>
-                {% endfor %}
-                <th>Submit</th>
-                <th>Remove</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in open_projects %}
-                <tr>
-                    {% for value in row %}
-                        {% if loop.index0 == 1 %}
-                            <td><a href="{{ url_for('nome_pagina_di_destinazione', uuid=row.uuid) }}">{{ value }}</a></td>
-                        {% else %}
-                            <td>{{ value }}</td>
-                        {% endif %}
-                    {% endfor %}
-                <td>
-                        <form action="{{ url_for('prj_route.prj_private') }}" method="post">
-                            <input type="hidden" name="action" value="submit_to_val">
-                            <button type="submit" name="submit_to_val" value="{{ row.uuid }}">Submit</button>
-                        </form>
-                    </td>
-                    <td>
-                        <form action="{{ url_for('res_route.res_private') }}" method="post">
-                            <input type="hidden" name="action" value="elimina">
-                            <button type="submit" name="elimina_project" value="{{ row.uuid }}">Elimina</button>
-                        </form>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
         <div style="margin-left:20px">
-            <h2>Lista di Approved Projects</h2>
+            <h2>Lista di Open Projects</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>Title</th>
+                        {% for column_name in column_names %}
+                            <th>{{ column_name }}</th>
+                        {% endfor %}
+                        <th>Submit</th>
                         <th>Remove</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for row in approved_projects %}
+                    {% for row in open_projects %}
                         <tr>
-                            <td><a href="{{ url_for('prj_route.prj_private', uuid=row.uuid) }}">{{ row.title }}</a></td>
+                            {% for value in row %}
+                                <td>{{ value }}</td>
+                            {% endfor %}
+                            <td>
+                                <form action="{{ url_for('prj_route.prj_private') }}" method="post">
+                                    <input type="hidden" name="action" value="submit_to_val">
+                                    <button type="submit" name="submit_to_val" value="{{ row.uuid }}">Submit</button>
+                                </form>
+                            </td>
                             <td>
                                 <form action="{{ url_for('res_route.res_private') }}" method="post">
                                     <input type="hidden" name="action" value="elimina">
@@ -142,9 +119,43 @@
                 </tbody>
             </table>
         </div>
-        <div>
+        <div style="margin-left:20px">
+            <h2>Lista di Approved Projects</h2>
+            <table>
+                <thead>
+                    <tr>
+                        {% for column_name in column_names %}
+                            <th>{{ column_name }}</th>
+                        {% endfor %}
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in approved_projects %}
+                        <tr>
+                            {% for value in row %}
+                                {% if loop.index0 != 0 %}
+                                    {% if loop.index0 == 1 %}
+                                        <td><a href="{{ url_for('prj_route.prj_private', prj_id=row.uuid) }}">{{ value }}</a></td>
+                                    {% else %}
+                                        <td>{{ value }}</td>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
+                            <td>
+                                <form action="{{ url_for('res_route.res_private') }}" method="post">
+                                    <input type="hidden" name="action" value="elimina">
+                                    <button type="submit" name="elimina_project" value="{{ row.uuid }}">Elimina</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div style="margin-left:20px">
             <h2>Add new Project</h2>
-            <form method="post">
+            <form method="post" id="projectForm">
                 <input type="hidden" name="action" value="aggiungi">
                 <div>
                     <label for="title">Title:</label>
@@ -154,10 +165,74 @@
                     <label for="description">Description:</label>
                     <input name="description" type="text" id="description" required>
                 </div>
+                                <div id="emailInputs">
+                    <label for="authors">Authors Email:</label>
+                    <div class="email-input">
+                        <label>
+                            <input name="authors[]" type="text">
+                        </label>
+                        <button type="button" class="remove-email">Remove</button>
+                    </div>
+                </div>
+                <button type="button" id="addEmailButton">Add Email</button>
                 <input type="submit" value="Add">
             </form>
         </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const form = document.getElementById("projectForm");
+        const addEmailButton = document.getElementById("addEmailButton");
+        const emailInputs = document.getElementById("emailInputs");
+
+        addEmailButton.addEventListener("click", function () {
+            const newEmailInput = document.createElement("div");
+            newEmailInput.classList.add("email-input");
+
+            const input = document.createElement("input");
+            input.name = "authors[]";
+            input.type = "text";
+            input.required = true;
+
+            const removeButton = document.createElement("button");
+            removeButton.type = "button";
+            removeButton.textContent = "Remove";
+            removeButton.classList.add("remove-email");
+
+            removeButton.addEventListener("click", function () {
+                newEmailInput.remove();
+            });
+
+            newEmailInput.appendChild(input);
+            newEmailInput.appendChild(removeButton);
+            emailInputs.appendChild(newEmailInput);
+        });
+
+        form.addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            // Raccolta delle email come array
+            const emailArray = Array.from(document.querySelectorAll("input[name='authors[]']"))
+                .map(input => input.value);
+
+            // Puoi fare qualcosa con l'array di email (es. inviarlo a Flask)
+            console.log("Email Array:", emailArray);
+
+            // Aggiungere eventuali azioni di invio a Flask qui
+            // Esempio: fetch('url_del_tuo_endpoint', { method: 'POST', body: JSON.stringify({ emails: emailArray }), headers: { 'Content-Type': 'application/json' } })
+            // .then(response => response.json())
+            // .then(data => console.log(data));
+
+            // Rendi il form visibile nella console per analisi approfondita
+            console.log("Form Submitted!");
+
+            // Rimuovi questo blocco se vuoi far sì che il form venga inviato regolarmente
+            // form.submit();
+        });
+    });
+</script>
     </main>
 </body>
 
 </html>
+
