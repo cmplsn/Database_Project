@@ -1,4 +1,5 @@
 import enum
+from datetime import datetime
 
 import bcrypt
 import uuid
@@ -138,7 +139,7 @@ class Message(db.Model):
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     object = Column(String, nullable=False)
     text = Column(Text)
-    date = Column(DateTime)
+    date = Column(DateTime, default=datetime.now())
     ResearcherUuid = Column(UUID(as_uuid=True), ForeignKey('researchers.userUuid'), nullable=False)
     ProjectUuid = Column(UUID(as_uuid=True), ForeignKey('projects.uuid'), nullable=False)
 
@@ -180,14 +181,14 @@ class Version(db.Model):
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     FileUuid = Column(UUID(as_uuid=True), ForeignKey('files.uuid', ondelete='CASCADE'))
     details = Column(Text)
-    submitted = Column(DateTime)
+    submitted = Column(DateTime, default=datetime.now())
     file = Column(LargeBinary)
     version = Column(Integer)
     files = relationship("File", back_populates="versions")
     reports = relationship("Report", back_populates="version")
 
     def getLastReport(self):
-        #last_report = resSess.execute(select(Report).filter_by(VersionsUuid=self.uuid).order_by(desc(Report.date))).first()
+        last_report = resSess.execute(select(Report).filter_by(VersionsUuid=self.uuid).order_by(desc(Report.submitted))).first()
         return last_report
 
     def __init__(self, details: Text, submitted: DateTime, version: Integer, file: LargeBinary, FileUuid: UUID,
@@ -213,7 +214,7 @@ class Report(db.Model):
     EvaluatorUuid = Column(UUID(as_uuid=True), ForeignKey('evaluators.userUuid'), nullable=False)
     VersionsUuid = Column(UUID(as_uuid=True), ForeignKey('versions.uuid', ondelete='CASCADE'))
     description = Column(Text)
-    submitted = Column(DateTime)
+    submitted = Column(DateTime, default=datetime.now())
     version = relationship("Version", back_populates="reports")
 
     def __init__(self, description: Text, EvaluatorUuid: UUID, VersionsUuid: UUID, uuid: UUID = null):
