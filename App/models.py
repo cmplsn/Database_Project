@@ -108,8 +108,7 @@ class Project(db.Model):
     description = Column(Text)
     status = Column(Enum(EvaluationsEnum), nullable=False, default=EvaluationsEnum.modificare)
     researchers = relationship("Researcher", secondary=author, backref='project')
-
-
+    files = relationship("File", back_populates="project")
 
 class Evaluator(User, UserMixin):
     __tablename__ = 'evaluators'
@@ -158,8 +157,8 @@ class File(db.Model):
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String, nullable=False)
     ProjectUuid = Column(UUID(as_uuid=True), ForeignKey('projects.uuid'), nullable=False)
-
-
+    versions = relationship("Version", back_populates="files")
+    project = relationship("Project", back_populates="files")
     def __init__(self, title: str, ProjectUuid: UUID, uuid: UUID = null):
         self.ProjectUuid = ProjectUuid
         self.title = title
@@ -180,8 +179,8 @@ class Version(db.Model):
     submitted = Column(DateTime)
     file = Column(LargeBinary)
     version = Column(Integer)
-
-
+    files = relationship("File", back_populates="versions")
+    reports = relationship("Report", back_populates="version")
     def __init__(self, details: Text, submitted: DateTime, version: Integer, file: LargeBinary, FileUuid: UUID,
                  uuid: UUID = null):
         self.FileUuid = FileUuid
@@ -201,6 +200,7 @@ class Report(db.Model):
     EvaluatorUuid = Column(UUID(as_uuid=True), ForeignKey('evaluators.userUuid'), nullable=False)
     VersionsUuid = Column(UUID(as_uuid=True), ForeignKey('versions.uuid', ondelete='CASCADE'))
     description = Column(Text)
+    version = relationship("Version", back_populates="reports")
 
     def __init__(self, description: Text, EvaluatorUuid: UUID, VersionsUuid: UUID, uuid: UUID = null):
         self.description = description

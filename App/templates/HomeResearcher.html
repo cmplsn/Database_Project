@@ -100,10 +100,12 @@
                     {% for row in open_projects %}
                         <tr>
                             {% for value in row %}
-                                {% if loop.index0 == 0 %}
-                                    <td><a href="{{ url_for('prj_route.prj_private', uuid=row.uuid) }}">{{ value }}</a></td>
-                                {% else %}
-                                    <td>{{ value }}</td>
+                                {% if loop.index0 != 0 %}
+                                    {% if loop.index0 == 1 %}
+                                        <td><a href="{{ url_for('prj_route.prj_private', uuid=row.uuid) }}">{{ value }}</a></td>
+                                    {% else %}
+                                        <td>{{ value }}</td>
+                                    {% endif %}
                                 {% endif %}
                             {% endfor %}
                             <td>
@@ -128,14 +130,24 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Title</th>
+                        {% for column_name in column_names %}
+                            <th>{{ column_name }}</th>
+                        {% endfor %}
                         <th>Remove</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for row in approved_projects %}
                         <tr>
-                            <td><a href="{{ url_for('prj_route.prj_private', uuid=row.uuid) }}">{{ row.title }}</a></td>
+                            {% for value in row %}
+                                {% if loop.index0 != 0 %}
+                                    {% if loop.index0 == 1 %}
+                                        <td><a href="{{ url_for('prj_route.prj_private', uuid=row.uuid) }}">{{ value }}</a></td>
+                                    {% else %}
+                                        <td>{{ value }}</td>
+                                    {% endif %}
+                                {% endif %}
+                            {% endfor %}
                             <td>
                                 <form action="{{ url_for('res_route.res_private') }}" method="post">
                                     <input type="hidden" name="action" value="elimina">

@@ -3,7 +3,7 @@ import enum
 
 from models import *
 from sqlalchemy import *
-from db import adminSess
+from App.db import adminSess
 
 
 from datetime import datetime
@@ -25,8 +25,12 @@ def populate_database():
         adminSess.add(evaluator_user)
         adminSess.commit()
         # Create a project
-        project = Project(title='Sample Project', description='This is a sample project', status='approvato')
+        project1 = Project(title='Sample Project1', description='This is a sample project', status='approvato')
+        project = Project(title='Sample Project', description='This is a sample project')
+        project.researchers = [researcher_user]
+        project1.researchers = [researcher_user]
         adminSess.add(project)
+        adminSess.add(project1)
 
         adminSess.commit()
 

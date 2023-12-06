@@ -8,8 +8,8 @@ from flask_smorest import *
 # from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import *
 from resourches.Project import prj_route
-from db import *
-from models import *
+from App.db import *
+from App.models import *
 from resourches.Admin import admin_route
 from resourches.Researcher import res_route
 from testing import populate_database
