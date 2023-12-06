@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pagura File / Report</title></head>
+<body>
+<h1>{{ file.title }}</h1>
+<p>Progetto: <span id=""> {{ file.project.title }}</span></p>
+<h2>Lista versioni</h2>
+<table>
+    <tr>
+        <th>Versione</th>
+        <th>Data di sottomissione</th>
+        <th>Report</th>
+    </tr>
+    {% for version in file.versions %}
+        <tr>
+            <th>
+                <p>{{ version.version }}<p>
+            </th>
+            <th><p>{{ version.submitted }}<p></th>
+            <th><p>{{ version.getLastReport().description }}<p></th>
+        </tr>
+    {% endfor %}
+</table>
+<h2>Report di usuializzazione file / report</h2>
+</body>
+</html>

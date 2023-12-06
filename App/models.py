@@ -5,10 +5,12 @@ import uuid
 
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import Column, ForeignKey, Integer, String, Text, Enum, Date, DateTime, LargeBinary, null, Table
+from sqlalchemy import Column, ForeignKey, Integer, String, Text, Enum, Date, DateTime, LargeBinary, null, Table, desc, \
+    select
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
-from App.db import Base
+from db import Base, resSess
+
 
 db = SQLAlchemy()
 
@@ -110,6 +112,7 @@ class Project(db.Model):
     researchers = relationship("Researcher", secondary=author, backref='project')
     files = relationship("File", back_populates="project")
 
+
 class Evaluator(User, UserMixin):
     __tablename__ = 'evaluators'
     __table_args__ = {'extend_existing': True}
@@ -159,6 +162,7 @@ class File(db.Model):
     ProjectUuid = Column(UUID(as_uuid=True), ForeignKey('projects.uuid'), nullable=False)
     versions = relationship("Version", back_populates="files")
     project = relationship("Project", back_populates="files")
+
     def __init__(self, title: str, ProjectUuid: UUID, uuid: UUID = null):
         self.ProjectUuid = ProjectUuid
         self.title = title
@@ -181,6 +185,11 @@ class Version(db.Model):
     version = Column(Integer)
     files = relationship("File", back_populates="versions")
     reports = relationship("Report", back_populates="version")
+
+    def getLastReport(self):
+        #last_report = resSess.execute(select(Report).filter_by(VersionsUuid=self.uuid).order_by(desc(Report.date))).first()
+        return last_report
+
     def __init__(self, details: Text, submitted: DateTime, version: Integer, file: LargeBinary, FileUuid: UUID,
                  uuid: UUID = null):
         self.FileUuid = FileUuid
@@ -191,6 +200,10 @@ class Version(db.Model):
 
         if uuid != null:
             self.uuid = uuid
+
+    def __str__(self):
+        return (f"Version ID: {self.uuid}, File ID: {self.FileUuid}, Details: {self.details}, "
+                f"Submitted: {self.submitted}, Version: {self.version}")
 
 
 class Report(db.Model):

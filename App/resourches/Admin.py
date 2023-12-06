@@ -1,11 +1,10 @@
 from datetime import datetime
-
 import requests
 from flask import *
 from flask_login import *
 from sqlalchemy import *
-from models import *
-from db import adminSess, evSess
+from App.models import *
+from App.db import adminSess, evSess
 
 admin_route = Blueprint('admin_route', __name__)
 
