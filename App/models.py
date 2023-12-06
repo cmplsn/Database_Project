@@ -20,7 +20,7 @@ class EvaluationsEnum(enum.Enum):  # todo: capire bene sta cosa degli enum come 
     nonapprovato = 4
 
 
-class Users(db.Model):
+class User(db.Model):
     __tablename__ = 'users'
     __table_args__ = {'extend_existing': True}
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -45,7 +45,7 @@ class Users(db.Model):
         return self.uuid
 
 
-class Admin(Users, UserMixin):
+class Admin(User, UserMixin):
     __tablename__ = 'admin'
     __table_args__ = {'extend_existing': True}
     userUuid = Column('userUuid', ForeignKey('users.uuid', ondelete='CASCADE'), primary_key=True)
@@ -72,12 +72,21 @@ class Admin(Users, UserMixin):
                 f"email:{self.email}, password='***', birthdate={self.birthdate},uuid={self.uuid})")
 
 
-class Researchers(Users, UserMixin):
+author = db.Table(
+    'authors',
+    db.Column('ProjectUuid', UUID(as_uuid=True), db.ForeignKey('projects.uuid'), primary_key=True),
+    db.Column('ResearcherUuid', UUID(as_uuid=True), db.ForeignKey('researchers.userUuid'), primary_key=True),
+    extend_existing=True
+)
+
+
+class Researcher(User, UserMixin):
     __tablename__ = 'researchers'
     __table_args__ = {'extend_existing': True}
     userUuid = Column('userUuid', ForeignKey('users.uuid', ondelete='CASCADE'), primary_key=True)
     password = Column(String, nullable=False)
     cv = Column(LargeBinary)
+    projects = relationship("Project", secondary=author, backref='researcher')
 
     def __init__(self, name: str, surname: str, email: str, password: str, birthdate: DateTime, cv: LargeBinary,
                  uuid: UUID = null):
@@ -91,7 +100,18 @@ class Researchers(Users, UserMixin):
         return bcrypt.checkpw(pwd.encode('utf-8'), self.password.encode('utf-8'))
 
 
-class Evaluators(Users, UserMixin):
+class Project(db.Model):
+    __tablename__ = 'projects'
+    __table_args__ = {'extend_existing': True}
+    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    title = Column(String, nullable=False)
+    description = Column(Text)
+    status = Column(Enum(EvaluationsEnum), nullable=False, default=EvaluationsEnum.modificare)
+    researchers = relationship("Researcher", secondary=author, backref='project')
+
+
+
+class Evaluator(User, UserMixin):
     __tablename__ = 'evaluators'
     __table_args__ = {'extend_existing': True}
     userUuid = Column('userUuid', ForeignKey('users.uuid', ondelete='CASCADE'), primary_key=True)
@@ -110,23 +130,7 @@ class Evaluators(Users, UserMixin):
         return bcrypt.checkpw(pwd.encode('utf-8'), self.password.encode('utf-8'))
 
 
-class Projects(db.Model):
-    __tablename__ = 'projects'
-    __table_args__ = {'extend_existing': True}
-    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    title = Column(String, nullable=False)
-    description = Column(Text)
-    status = Column(Enum(EvaluationsEnum), nullable=False, default=EvaluationsEnum.modificare)
-
-
-Authors = Table('authors', Base.metadata,
-                Column('ProjectUuid', UUID, ForeignKey('projects.uuid'), primary_key=True),
-                Column('ResearcherUuid', UUID, ForeignKey('researchers.userUuid'), primary_key=True),
-                extend_existing=True
-                )
-
-
-class Messages(db.Model):
+class Message(db.Model):
     __tablename__ = 'messages'
     __table_args__ = {'extend_existing': True}
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -148,7 +152,7 @@ class Messages(db.Model):
             self.uuid = uuid
 
 
-class Files(db.Model):
+class File(db.Model):
     __tablename__ = 'files'
     __table_args__ = {'extend_existing': True}
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -167,7 +171,7 @@ class Files(db.Model):
         return f"File(projectuuid:{self.projectuuid}), title='{self.title}', uuid={self.uuid}"
 
 
-class Versions(db.Model):
+class Version(db.Model):
     __tablename__ = 'versions'
     __table_args__ = {'extend_existing': True}
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -190,7 +194,7 @@ class Versions(db.Model):
             self.uuid = uuid
 
 
-class Reports(db.Model):
+class Report(db.Model):
     __tablename__ = 'reports'
     __table_args__ = {'extend_existing': True}
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)

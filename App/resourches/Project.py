@@ -4,8 +4,8 @@ import requests
 from flask import *
 from flask_login import *
 from sqlalchemy import *
-from App.models import *
-from App.db import resSess, adminSess
+from models import *
+from db import resSess, adminSess
 
 prj_route = Blueprint('prj_route', __name__)
 
@@ -15,20 +15,20 @@ def prj_private(prj_id):
     try:
         if request.method == 'GET':
             files = resSess.execute(
-                select(Files.title).where(
-                    Files.ProjectUuid == prj_id)).all()
-            prj_info = resSess.execute(select(Projects.title, Projects.description).where(Projects.uuid == prj_id)).all()
+                select(File.title).where(
+                    File.ProjectUuid == prj_id)).all()
+            prj_info = resSess.execute(select(Project.title, Project.description).where(Project.uuid == prj_id)).all()
             return render_template('Project.html',
                                    files=files,
                                    prj=prj_info)
         elif request.method == 'POST':
             if request.form.get('action') == "elimina":  # Elimina progetto
                 prj_to_remove = request.form['elimina_file']
-                resSess.execute(delete(Projects).where(Files.uuid == prj_to_remove))
+                resSess.execute(delete(Project).where(File.uuid == prj_to_remove))
                 resSess.commit()
                 return redirect(url_for('res_route.res_private'))
             elif request.form.get('action') == "aggiungi":  # Aggiungi progetto
-                new_prj = Projects(title=request.form['title'], description=request.form['description'])
+                new_prj = Project(title=request.form['title'], description=request.form['description'])
                 resSess.add(new_prj)
                 resSess.commit()
     except Exception as e:
