@@ -1,3 +1,4 @@
+import datetime
 import enum
 
 import bcrypt
@@ -9,7 +10,7 @@ from sqlalchemy import Column, ForeignKey, Integer, String, Text, Enum, Date, Da
     select
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
-from db import Base, resSess
+from App.db import Base, resSess
 
 
 db = SQLAlchemy()
@@ -187,7 +188,7 @@ class Version(db.Model):
     reports = relationship("Report", back_populates="version")
 
     def getLastReport(self):
-        #last_report = resSess.execute(select(Report).filter_by(VersionsUuid=self.uuid).order_by(desc(Report.date))).first()
+        last_report = resSess.execute(select(Report).filter_by(VersionsUuid=self.uuid).order_by(desc(Report.date))).first()
         return last_report
 
     def __init__(self, details: Text, submitted: DateTime, version: Integer, file: LargeBinary, FileUuid: UUID,

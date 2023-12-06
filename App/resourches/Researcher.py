@@ -20,8 +20,10 @@ def res_private():
         test = user.projects
         if request.method == 'GET':
             column_names = ["Titolo", "Status"]
-            open_projects = [[prj.uuid, prj.title, prj.status] for prj in test if prj.status != EvaluationsEnum.approvato]
-            approved_projects = [[prj.uuid, prj.title, prj.status] for prj in test if prj.status == EvaluationsEnum.approvato]
+            open_projects = [[prj.uuid, prj.title, prj.status] for prj in test if
+                             prj.status != EvaluationsEnum.approvato]
+            approved_projects = [[prj.uuid, prj.title, prj.status] for prj in test if
+                                 prj.status == EvaluationsEnum.approvato]
             return render_template('HomeResearcher.html', user_name=user.name, column_names=column_names,
                                    open_projects=open_projects,
                                    approved_projects=approved_projects, email_array=email_list)
@@ -55,8 +57,10 @@ def res_private():
                 resSess.add(new_prj)
                 resSess.commit()
                 return redirect(url_for('res_route.res_private'))
+            elif request.form.get('action') == "redirect":  # Redirect progetto
+                prj_id_to_redirect = request.form['prj_id']
+                return redirect(url_for('prj_route.prj_private', prj_id=prj_id_to_redirect))
     except Exception as e:
         print(e)
         resSess.rollback()
         return Response(status=500)  # 500 = codice di errore
-

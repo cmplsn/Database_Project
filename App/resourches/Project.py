@@ -10,10 +10,9 @@ from App.db import resSess, adminSess
 prj_route = Blueprint('prj_route', __name__)
 
 
-@prj_route.route('/prj_private', methods=['GET', 'POST', 'DELETE', 'PUT'])
-def prj_private():
+@prj_route.route('/prj_private/<prj_id>', methods=['GET', 'POST', 'DELETE', 'PUT'])
+def prj_private(prj_id):
     try:
-        prj_id = 1
         if request.method == 'GET':
             files = resSess.execute(
                 select(File.title).where(

@@ -92,6 +92,7 @@
                         {% for column_name in column_names %}
                             <th>{{ column_name }}</th>
                         {% endfor %}
+                        <th>Go To File</th>
                         <th>Submit</th>
                         <th>Remove</th>
                     </tr>
@@ -100,10 +101,18 @@
                     {% for row in open_projects %}
                         <tr>
                             {% for value in row %}
-                                <td>{{ value }}</td>
+                                {% if loop.index0 != 0 %}
+                                    <td>{{ value }}</td>
+                                {% endif %}
                             {% endfor %}
                             <td>
-                                <form action="{{ url_for('prj_route.prj_private') }}" method="post">
+                                <form action="{{ url_for('prj_route.prj_private', prj_id=row.uuid) }}" method="post">
+                                    <input type="hidden" name="action" value="redirect">
+                                    <button type="submit" name="redirect">Go To File</button>
+                                </form>
+                            </td>
+                            <td>
+                                <form action="{{ url_for('res_route.res_private') }}" method="post">
                                     <input type="hidden" name="action" value="submit_to_val">
                                     <button type="submit" name="submit_to_val" value="{{ row.uuid }}">Submit</button>
                                 </form>
@@ -127,6 +136,8 @@
                         {% for column_name in column_names %}
                             <th>{{ column_name }}</th>
                         {% endfor %}
+                        <th>Go To File</th>
+                        <th>Submit</th>
                         <th>Remove</th>
                     </tr>
                 </thead>
@@ -135,13 +146,22 @@
                         <tr>
                             {% for value in row %}
                                 {% if loop.index0 != 0 %}
-                                    {% if loop.index0 == 1 %}
-                                        <td><a href="{{ url_for('prj_route.prj_private', prj_id=row.uuid) }}">{{ value }}</a></td>
-                                    {% else %}
-                                        <td>{{ value }}</td>
-                                    {% endif %}
+                                    <td>{{ value }}</td>
                                 {% endif %}
                             {% endfor %}
+                            <td>
+                                <form action="{{ url_for('prj_route.prj_private', prj_id=row.uuid) }}" method="post">
+                                    <input type="hidden" name="action" value="redirect">
+                                    <button type="submit" name="redirect">Go To File</button>
+                                </form>
+
+                            </td>
+                            <td>
+                                <form action="{{ url_for('res_route.res_private') }}" method="post">
+                                    <input type="hidden" name="action" value="submit_to_val">
+                                    <button type="submit" name="submit_to_val" value="{{ row.uuid }}">Submit</button>
+                                </form>
+                            </td>
                             <td>
                                 <form action="{{ url_for('res_route.res_private') }}" method="post">
                                     <input type="hidden" name="action" value="elimina">
