@@ -100,13 +100,7 @@
                     {% for row in open_projects %}
                         <tr>
                             {% for value in row %}
-                                {% if loop.index0 != 0 %}
-                                    {% if loop.index0 == 1 %}
-                                        <td><a href="{{ url_for('prj_route.prj_private', uuid=row.uuid) }}">{{ value }}</a></td>
-                                    {% else %}
-                                        <td>{{ value }}</td>
-                                    {% endif %}
-                                {% endif %}
+                                <td>{{ value }}</td>
                             {% endfor %}
                             <td>
                                 <form action="{{ url_for('prj_route.prj_private') }}" method="post">
@@ -142,7 +136,7 @@
                             {% for value in row %}
                                 {% if loop.index0 != 0 %}
                                     {% if loop.index0 == 1 %}
-                                        <td><a href="{{ url_for('prj_route.prj_private', uuid=row.uuid) }}">{{ value }}</a></td>
+                                        <td><a href="{{ url_for('prj_route.prj_private', prj_id=row.uuid) }}">{{ value }}</a></td>
                                     {% else %}
                                         <td>{{ value }}</td>
                                     {% endif %}

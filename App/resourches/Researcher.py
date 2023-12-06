@@ -49,12 +49,14 @@ def res_private():
                         resSess.add(new_author)
 
                 resSess.commit()
+                return redirect(url_for('res_route.res_private'))
             elif request.form.get('action') == "submit_to_val":  # submit progetto
                 new_prj = Project(title=request.form['title'], description=request.form['description'])
                 resSess.add(new_prj)
                 resSess.commit()
+                return redirect(url_for('res_route.res_private'))
     except Exception as e:
         print(e)
         resSess.rollback()
         return Response(status=500)  # 500 = codice di errore
-    return redirect(url_for('res_route.res_private'))
+

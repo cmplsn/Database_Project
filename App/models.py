@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, Enum, Date, DateTime, LargeBinary, null, Table
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
-from db import Base
+from App.db import Base
 
 db = SQLAlchemy()
 
@@ -200,6 +200,7 @@ class Report(db.Model):
     EvaluatorUuid = Column(UUID(as_uuid=True), ForeignKey('evaluators.userUuid'), nullable=False)
     VersionsUuid = Column(UUID(as_uuid=True), ForeignKey('versions.uuid', ondelete='CASCADE'))
     description = Column(Text)
+    submitted = Column(DateTime)
     version = relationship("Version", back_populates="reports")
 
     def __init__(self, description: Text, EvaluatorUuid: UUID, VersionsUuid: UUID, uuid: UUID = null):

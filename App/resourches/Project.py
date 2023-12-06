@@ -4,15 +4,16 @@ import requests
 from flask import *
 from flask_login import *
 from sqlalchemy import *
-from models import *
-from db import resSess, adminSess
+from App.models import *
+from App.db import resSess, adminSess
 
 prj_route = Blueprint('prj_route', __name__)
 
 
 @prj_route.route('/prj_private', methods=['GET', 'POST', 'DELETE', 'PUT'])
-def prj_private(prj_id):
+def prj_private():
     try:
+        prj_id = 1
         if request.method == 'GET':
             files = resSess.execute(
                 select(File.title).where(
