@@ -4,7 +4,7 @@ from flask import *
 from flask_login import *
 from sqlalchemy import *
 from App.models import *
-from App.db import resSess, adminSess
+from App.db import resSess, adminSess, evSess
 
 eval_route = Blueprint('eval_route', __name__)
 
@@ -27,8 +27,8 @@ def eval_files(uuid_project):
         elif request.method == 'POST':
             newReport = Report(description=request.form['report'] , EvaluatorUuid=current_user.userUuid, VersionsUuid=request.form['versionUuid'])
             #TODO: cambiare con ResSess (occhio che non ha i permessi)
-            adminSess.add(newReport)
-            adminSess.commit()
+            evSess.add(newReport)
+            evSess.commit()
             #return redirect(url_for('eval_route.eval_files'))
             return redirect('/eval_files/'+uuid_project)
     except Exception as e:
