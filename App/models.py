@@ -22,6 +22,20 @@ class EvaluationsEnum(enum.Enum):  # todo: capire bene sta cosa degli enum come 
     modificare = 3
     nonapprovato = 4
 
+    @staticmethod
+    def getStringEvaluation(enum):
+        if enum == EvaluationsEnum.approvato: return 'approvato'
+        elif enum == EvaluationsEnum.sottomessoperval: return 'sottomesso per valutazione'
+        elif enum == EvaluationsEnum.modificare: return 'modificare'
+        else: return 'non approvato'
+
+    @staticmethod
+    def getEvaluationsEnum(str):
+        if str == 'approvato': return EvaluationsEnum.approvato
+        elif str == 'sottomessoperval': return EvaluationsEnum.sottomessoperval
+        elif str == 'modificare': return EvaluationsEnum.modificare
+        else: return EvaluationsEnum.nonapprovato
+
 
 class User(db.Model):
     __tablename__ = 'users'
@@ -171,6 +185,10 @@ class File(db.Model):
         if uuid != null:
             self.uuid = uuid
 
+    def getLastVersion(self):
+        last_version = resSess.execute(select(Version).filter_by(FileUuid=self.uuid).order_by(desc(Version.submitted))).first()
+        return last_version
+
     def __repr__(self):
         return f"File(projectuuid:{self.projectuuid}), title='{self.title}', uuid={self.uuid}"
 
@@ -185,11 +203,14 @@ class Version(db.Model):
     file = Column(LargeBinary)
     version = Column(Integer)
     files = relationship("File", back_populates="versions")
-    reports = relationship("Report", back_populates="version")
 
+    reports = relationship("Report", back_populates="version")
     def getLastReport(self):
         last_report = resSess.execute(select(Report).filter_by(VersionsUuid=self.uuid).order_by(desc(Report.submitted))).first()
         return last_report
+
+    def __repr__(self):
+        return f"<Version(uuid='{self.uuid}', FileUuid='{self.FileUuid}', details='{self.details}', submitted='{self.submitted}', version='{self.version}')>"
 
     def __init__(self, details: Text, submitted: DateTime, version: Integer, file: LargeBinary, FileUuid: UUID,
                  uuid: UUID = null):

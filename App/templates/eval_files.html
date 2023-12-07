@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Evaluate files</title>
+</head>
+<body>
+<h1>{{ project.title }}</h1>
+<h3>Lista file non approvati</h3>
+<table>
+    <tr>
+        <th>Titolo</th>
+        <th>Scarica</th>
+        <th>Inserisci report</th>
+        <th>Salva</th>
+    </tr>
+    {% for file in project.files %}
+
+        {% if file.getLastVersion() != none and file.getLastVersion().Version.reports == [] %}
+            <tr>
+                <form method="post">
+                    <input type="hidden" name="fileUuid" value="{{ file.uuid }}">
+                    <input type="hidden" name="versionUuid" value="{{ file.getLastVersion().Version.uuid }}">
+                    <th>{{ file.title }}</th>
+                    <th><a href="/get_version/{{ file.uuid }}/{{ file.getLastVersion().Version.uuid }}">Apri</a></th>
+                    <th><input type="text" name="report" id="report" required></th>
+                    <th><input type="submit"></th>
+                </form>
+            </tr>
+        {% endif %}
+    {% endfor %}
+</table>
+<h3>Storico dei report</h3>
+<table>
+    <tr>
+        <th>Titolo</th>
+        <th>Scarica</th>
+        <th>Inserisci report</th>
+    </tr>
+    {% for file in project.files %}
+
+        {% if file.getLastVersion() != none and file.getLastVersion().Version.reports != [] %}
+            <tr>
+                <th>{{ file.title }}</th>
+                <th><a href="/get_version/{{ file.uuid }}/{{ file.getLastVersion().Version.uuid }}">Apri</a></th>
+                <th>{{ file.getLastVersion().Version.reports[0].description }}</th>
+            </tr>
+        {% endif %}
+    {% endfor %}
+</table>
+</body>
+</html>
