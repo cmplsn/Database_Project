@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project</title>
+    <title>ProjectFiles</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -35,13 +35,6 @@
             justify-content: space-between;
         }
 
-        table {
-            width: 100%;
-            text-align: center;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
         form {
             background-color: #fff;
             padding: 20px;
@@ -65,67 +58,58 @@
         }
 
         input[type="submit"],
-        input[type="file"] {
+        input[type="file"],
+        button {
             background-color: #007bff;
             color: #fff;
             cursor: pointer;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
         }
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/datepicker.min.css">
 </head>
 
 <body>
     <header>
-        <h1>prj.title</h1>
+        <h1>{{ prj.title }}</h1>
+        <h2>{{ prj.description }}</h2>
     </header>
-    <h2>prj.description</h2>
     <main>
-<div style="margin-left:20px">
-    <h2>Lista di Files</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Remove</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in open_projects %}
-                <tr>
-                    {% for value in row %}
-                        {% if loop.index0 == 1 %}
-                            <td><a href="{{ url_for('nome_pagina_di_destinazione', uuid=row.uuid) }}">{{ value }}</a></td>
-                        {% else %}
-                            <td>{{ value }}</td>
-                        {% endif %}
+        <div style="margin-left:20px">
+            <h2>Lista di Files</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in files %}
+                        <tr>
+                            {% for value in row %}
+                                {% if loop.index0 == 1 %}
+                                    <td>
+                                        <a href="{{ url_for('file_route.file_page', uuid_file=row[0]) }}">{{ value }}</a>
+                                    </td>
+                                {% else %}
+                                    {# Gestisci altri casi se necessario #}
+                                {% endif %}
+                            {% endfor %}
+                            <td>
+                                <form action="{{ url_for('prj_route.prj_private', prj_id=row[0]) }}" method="post">
+                                    <input type="hidden" name="action" value="elimina">
+                                    <button type="submit" name="elimina_file" value="{{ row[0] }}">Elimina</button>
+                                </form>
+                            </td>
+                        </tr>
                     {% endfor %}
-                    <td>
-                        <form action="{{ url_for('prj_route.prj_private') }}" method="post">
-                            <input type="hidden" name="action" value="elimina">
-                            <button type="submit" name="elimina_file" value="{{ row.uuid }}">Elimina</button>
-                        </form>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-        <div>
-            <h2>Messages</h2>
-            <form method="post">
-                <input type="hidden" name="action" value="aggiungi">
-                <div>
-                    <label for="title">Title:</label>
-                    <input name="title" type="text" id="title" required>
-                </div>
-                <div>
-                    <label for="description">Description:</label>
-                    <input name="description" type="text" id="description" required>
-                </div>
-                <input type="submit" value="Add">
-            </form>
+                </tbody>
+            </table>
         </div>
-</div>>
     </main>
 </body>
 
 </html>
+

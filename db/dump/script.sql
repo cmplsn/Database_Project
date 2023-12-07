@@ -142,7 +142,7 @@ GRANT INSERT, SELECT , UPDATE ON "users", "projects", "evaluators", "reports" TO
 GRANT USAGE ON SCHEMA project_schema TO ev_role;
 
 ---res_role:
-GRANT SELECT  ON "reports", "evaluators" TO res_role;
-GRANT INSERT, SELECT  ON "messages", "authors", "files" TO res_role;
-GRANT INSERT, SELECT , UPDATE ON "researchers", "projects", "users", "versions" TO res_role;
+GRANT SELECT  ON "reports", "evaluators", "users" TO res_role;
+GRANT INSERT, SELECT ON "messages" TO res_role;
+GRANT ALL ON "authors", "files", "researchers", "projects", "versions" TO res_role;
 GRANT USAGE ON SCHEMA project_schema TO res_role;

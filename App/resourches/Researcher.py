@@ -59,6 +59,7 @@ def res_private():
                 return redirect(url_for('res_route.res_private'))
             elif request.form.get('action') == "redirect":  # Redirect progetto
                 prj_id_to_redirect = request.form['prj_id']
+
                 return redirect(url_for('prj_route.prj_private', prj_id=prj_id_to_redirect))
     except Exception as e:
         print(e)

@@ -7,6 +7,8 @@ from flask_smorest import *
 # from flask_security import Security
 # from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import *
+
+from App.resourches.File import file_route
 from resourches.Project import prj_route
 from App.db import *
 from App.models import *
@@ -26,6 +28,7 @@ app.config['OPENAPI_SWAGGER_UI_URL'] = "https://cdn.jsdelivr.net/npm/swagger-ui-
 app.register_blueprint(admin_route)
 app.register_blueprint(res_route)
 app.register_blueprint(prj_route)
+app.register_blueprint(file_route)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
