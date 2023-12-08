@@ -1,11 +1,79 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registration form</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
 
-{% block pagebody %}
-<form action="/registration" method="POST">
-    EMAIL:
-    <input name="email" type="text">
-    PASSWORD:
-    <input name="password" type="text">
-    <input type="submit">
-</form>
-{% endblock %}
+        header {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        main {
+            display: flex;
+            width: 100%;
+            box-sizing: border-box;
+            justify-content: space-between; /* Modifica: sposta a destra il form di aggiunta */
+        }
+        </style>
+</head>
+<body>
+<header>Registration</header>
+<main>
+    <div>
+            <form method="post" enctype="multipart/form-data"> <!-- Modifica: Aggiunto enctype per gestire l'upload di file -->
+                <input type="hidden" name="action" value="aggiungi">
+                <div>
+                    <label for="name">Name:</label>
+                    <input name="name" type="text" id="name" required>
+                </div>
+                <div>
+                    <label for="surname">Surname:</label>
+                    <input name="surname" type="text" id="surname" required>
+                </div>
+                <div>
+                    <label for="dateofbirth">Date of Birth:</label>
+                    <input name="dateofbirth" type="text" id="dateofbirth" required>
+                    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                    <script src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/datepicker.min.js"></script>
+                    <script>
+                        $(document).ready(function(){
+                            $('#dateofbirth').datepicker({
+                                format: 'yyyy-mm-dd',
+                                autoHide: true
+                            });
+                        });
+                    </script>
+                </div>
+                <div>
+                    <label for="email">Email:</label>
+                    <input name="email" type="email" id="email" required>
+                </div>
+                <div>
+                    <label for="password">Password:</label>
+                    <input name="password" type="password" id="password" required>
+                </div>
+                <input type="submit" value="Add">
+            </form>
+        </div>
+</main>
+<a href='/login'>Sei già registrato? Effettua il login</a>
+</body>
