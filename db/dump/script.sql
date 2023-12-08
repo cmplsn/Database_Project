@@ -59,13 +59,11 @@ CREATE TABLE "projects"
 CREATE TABLE "messages"
 (
     "uuid"             UUID DEFAULT uuid_generate_v4(),
-    "object"           VARCHAR NOT NULL,
-    "text"             TEXT,
+    "sender"           BOOLEAN NOT NULL,
+    "text"             TEXT NOT NULL,
     "date"             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "ResearcherUuid"   UUID,
     "ProjectUuid"      UUID,
-    PRIMARY KEY ("uuid", "ResearcherUuid", "ProjectUuid"),
-    FOREIGN KEY ("ResearcherUuid") REFERENCES "researchers" ("userUuid") ON DELETE CASCADE,
+    PRIMARY KEY ("uuid", "ProjectUuid"),
     FOREIGN KEY ("ProjectUuid") REFERENCES "projects" ("uuid") ON DELETE CASCADE
 );
 

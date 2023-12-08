@@ -7,7 +7,7 @@ import uuid
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, Enum, Date, DateTime, LargeBinary, null, Table, desc, \
-    select
+    select, Boolean
 from sqlalchemy.orm import relationship
 from sqlalchemy.dialects.postgresql import UUID
 from App.db import Base, resSess
@@ -112,7 +112,7 @@ class Project(db.Model):
     status = Column(Enum(EvaluationsEnum), nullable=False, default=EvaluationsEnum.modificare)
     researchers = relationship("Researcher", secondary=author, backref='project')
     files = relationship("File", back_populates="project")
-
+    messages = relationship("Message", back_populates="project")
 
 class Evaluator(User, UserMixin):
     __tablename__ = 'evaluators'
@@ -137,18 +137,16 @@ class Message(db.Model):
     __tablename__ = 'messages'
     __table_args__ = {'extend_existing': True}
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    object = Column(String, nullable=False)
+    sender = Column(Boolean, nullable=False)
     text = Column(Text)
     date = Column(DateTime)
-    ResearcherUuid = Column(UUID(as_uuid=True), ForeignKey('researchers.userUuid'), nullable=False)
     ProjectUuid = Column(UUID(as_uuid=True), ForeignKey('projects.uuid'), nullable=False)
-
-    def __init__(self, object: String, text: Text, date: DateTime, ResearcherUuid: UUID, ProjectUuid: UUID,
+    project = relationship("Project", back_populates="messages")
+    def __init__(self, sender: bool, text: Text, date: DateTime, ProjectUuid: UUID,
                  uuid: UUID = null):
-        self.object = object
+        self.sender = sender
         self.text = text
         self.date = date
-        self.ResearcherUuid = ResearcherUuid
         self.ProjectUuid = ProjectUuid
 
         if uuid != null:
