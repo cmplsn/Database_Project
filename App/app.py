@@ -7,11 +7,11 @@ from flask_smorest import *
 # from flask_security import Security
 # from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import *
-
-from App.resourches.File import file_route
+from resourches.Evaluetor import eval_route
+from resourches.File import file_route
 from resourches.Project import prj_route
-from App.db import *
-from App.models import *
+from db import *
+from models import *
 from resourches.Admin import admin_route
 from resourches.Researcher import res_route
 from testing import populate_database
@@ -28,7 +28,9 @@ app.config['OPENAPI_SWAGGER_UI_URL'] = "https://cdn.jsdelivr.net/npm/swagger-ui-
 app.register_blueprint(admin_route)
 app.register_blueprint(res_route)
 app.register_blueprint(prj_route)
+app.register_blueprint(eval_route)
 app.register_blueprint(file_route)
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -127,7 +129,7 @@ def login():
                 print('ho trovato evaluator in login')
                 if ev.auth_pwd(request.form['password']):
                     login_user(ev)
-                    return redirect(url_for('private'))
+                    return redirect(url_for('eval_route.eval_files'))
                 else:
                     return render_template('Login.html', login_error=True)
             elif res is not None:
