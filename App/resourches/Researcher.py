@@ -33,6 +33,12 @@ def res_private():
                 resSess.execute(delete(Project).where(Project.uuid == prj_to_remove))
                 resSess.commit()
                 return redirect(url_for('res_route.res_private'))
+            elif request.form.get('action') == "submit_to_val":  # submit progetto
+                prj_to_update = request.form['submit_to_val']
+                prj = resSess.execute(select(Project).where(Project.uuid == prj_to_update)).fetchone()
+                prj.status = EvaluationsEnum.sottomessoperval
+                resSess.commit()
+                return jsonify({'status': 'success'})
             elif request.path == '/res_private':  # Aggiungi progetto
                 data = request.get_json()
                 new_prj = Project(title=data['title'], description=data['description'])
@@ -47,11 +53,6 @@ def res_private():
                 resSess.add(new_prj)
                 resSess.commit()
                 return jsonify({'status': 'success'})
-            elif request.form.get('action') == "submit_to_val":  # submit progetto
-                new_prj = Project(title=request.form['title'], description=request.form['description'])
-                resSess.add(new_prj)
-                resSess.commit()
-                return redirect(url_for('res_route.res_private'))
             elif request.form.get('action') == "redirect":  # Redirect progetto
                 prj_id_to_redirect = request.form['prj_id']
                 return redirect(url_for('prj_route.prj_private', prj_id=prj_id_to_redirect))

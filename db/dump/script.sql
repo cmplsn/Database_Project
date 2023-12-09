@@ -52,7 +52,7 @@ CREATE TABLE "projects"
     "uuid"        UUID DEFAULT uuid_generate_v4(),
     "title"       VARCHAR NOT NULL,
     "description" TEXT,
-    "status"      evaluations_enum DEFAULT 'modificare',
+    "status"      evaluations_enum DEFAULT 'sottomessoperval',
     PRIMARY KEY ("uuid")
 );
 

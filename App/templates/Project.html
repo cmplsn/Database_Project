@@ -145,7 +145,7 @@
                                 {% endif %}
                             {% endfor %}
                             <td>
-                                <form action="{{ url_for('prj_route.prj_private', prj_id=row[0]) }}" method="post">
+                                <form action="{{ url_for('prj_route.prj_private', prj_id=prj.uuid) }}" method="post">
                                     <input type="hidden" name="action" value="elimina">
                                     <button type="submit" name="elimina_file" value="{{ row[0] }}">Elimina</button>
                                 </form>

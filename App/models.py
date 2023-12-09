@@ -110,7 +110,7 @@ class Project(db.Model):
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     title = Column(String, nullable=False)
     description = Column(Text)
-    status = Column(Enum(EvaluationsEnum), nullable=False, default=EvaluationsEnum.modificare)
+    status = Column(Enum(EvaluationsEnum), nullable=False, default=EvaluationsEnum.sottomessoperval)
     researchers = relationship("Researcher", secondary=author, backref='project')
     files = relationship("File", back_populates="project")
     messages = relationship("Message", back_populates="project")
