@@ -17,13 +17,30 @@
     {% for version in file.versions %}
         <tr>
             <th>
-                <p>{{ version.version }}<p>
+                <a href="/get_version/{{ file.uuid }}/{{ version.uuid }}"> <p>{{ version.version }}<p> </a>
             </th>
             <th><p>{{ version.submitted }}<p></th>
-            <th><p>{{ version.getLastReport().description }}<p></th>
+            <th>{% if version.getLastReport() != none %}
+                <p>{{ version.getLastReport().Report.description }}<p>
+                {% else %}
+                <p>Ancora in valutazione<p>
+                {% endif %}
+            </th>
+        <th><a href="/"></a></th>
         </tr>
     {% endfor %}
 </table>
-<h2>Report di usuializzazione file / report</h2>
+<h3>Aggiungi una nuova versione</h3>
+<form method="post" enctype="multipart/form-data">
+    <label for="">Versione</label>
+    <input type="number" name="version" id="version">
+    <br>
+    <label for="">Dettagli</label>
+    <input type="text" name="details" id="details">
+    <br>
+    <input type="file" name="newVersion" id="newVersion" name="">
+    <input type="submit">
+</form>
+<h2></h2>
 </body>
 </html>

@@ -45,4 +45,3 @@ def prj_private(prj_id):
         print(e)
         resSess.rollback()
     return Response(status=500)
-

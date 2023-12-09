@@ -1,5 +1,6 @@
 import datetime
 import enum
+from datetime import datetime
 
 import bcrypt
 import uuid
@@ -179,7 +180,7 @@ class Version(db.Model):
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     FileUuid = Column(UUID(as_uuid=True), ForeignKey('files.uuid', ondelete='CASCADE'))
     details = Column(Text)
-    submitted = Column(DateTime)
+    submitted = Column(DateTime, default=datetime.now())
     file = Column(LargeBinary)
     version = Column(Integer)
     files = relationship("File", back_populates="versions")
@@ -212,7 +213,7 @@ class Report(db.Model):
     EvaluatorUuid = Column(UUID(as_uuid=True), ForeignKey('evaluators.userUuid'), nullable=False)
     VersionsUuid = Column(UUID(as_uuid=True), ForeignKey('versions.uuid', ondelete='CASCADE'))
     description = Column(Text)
-    submitted = Column(DateTime)
+    submitted = Column(DateTime, default=datetime.now())
     version = relationship("Version", back_populates="reports")
 
     def __init__(self, description: Text, EvaluatorUuid: UUID, VersionsUuid: UUID, uuid: UUID = null):
