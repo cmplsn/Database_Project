@@ -20,8 +20,10 @@ def res_private():
         test = user.projects
         if request.method == 'GET':
             column_names = ["Titolo", "Status"]
-            open_projects = [[prj.uuid, prj.title, prj.status] for prj in test if prj.status != EvaluationsEnum.approvato]
-            approved_projects = [[prj.uuid, prj.title, prj.status] for prj in test if prj.status == EvaluationsEnum.approvato]
+            open_projects = [[prj.uuid, prj.title, prj.status] for prj in test if
+                             prj.status != EvaluationsEnum.approvato]
+            approved_projects = [[prj.uuid, prj.title, prj.status] for prj in test if
+                                 prj.status == EvaluationsEnum.approvato]
             return render_template('HomeResearcher.html', user_name=user.name, column_names=column_names,
                                    open_projects=open_projects,
                                    approved_projects=approved_projects, email_array=email_list)
@@ -31,32 +33,30 @@ def res_private():
                 resSess.execute(delete(Project).where(Project.uuid == prj_to_remove))
                 resSess.commit()
                 return redirect(url_for('res_route.res_private'))
-            elif request.form.get('action') == "aggiungi":  # Aggiungi progetto
-                new_prj = Project(title=request.form['title'], description=request.form['description'])
-                resSess.add(new_prj)
-                resSess.commit()
-
-                # Crea una relazione tra il nuovo progetto e l'utente corrente
-                new_author = author(ResearcherUuid=current_user.uuid, ProjectUuid=new_prj.uuid)
-                resSess.add(new_author)
-
-                # Aggiungi gli autori dal form escludendo l'utente corrente
-                email_list = request.form.getlist('authors[]')
-                for email in email_list:
-                    if email != current_user.email:
-                        us = resSess.execute(select(User).where(User.email == email)).fetchone()
-                        new_author = author(ResearcherUuid=us.uuid, ProjectUuid=new_prj.uuid)
-                        resSess.add(new_author)
-
-                resSess.commit()
-                return redirect(url_for('res_route.res_private'))
             elif request.form.get('action') == "submit_to_val":  # submit progetto
-                new_prj = Project(title=request.form['title'], description=request.form['description'])
+                prj_to_update = request.form['submit_to_val']
+                prj = resSess.execute(select(Project).where(Project.uuid == prj_to_update)).fetchone()
+                prj.status = EvaluationsEnum.sottomessoperval
+                resSess.commit()
+                return jsonify({'status': 'success'})
+            elif request.path == '/res_private':  # Aggiungi progetto
+                data = request.get_json()
+                new_prj = Project(title=data['title'], description=data['description'])
+                # Aggiungi gli autori dal form escludendo l'utente corrente
+                for email in data['emails']:
+                    if email != current_user.email:
+                        us = resSess.execute(select(Researcher).where(Researcher.email == email)).fetchone()
+                        us = us.Researcher
+                        if us:
+                            new_prj.researchers.append(us)
+                new_prj.researchers.append(user)
                 resSess.add(new_prj)
                 resSess.commit()
-                return redirect(url_for('res_route.res_private'))
+                return jsonify({'status': 'success'})
+            elif request.form.get('action') == "redirect":  # Redirect progetto
+                prj_id_to_redirect = request.form['prj_id']
+                return redirect(url_for('prj_route.prj_private', prj_id=prj_id_to_redirect))
     except Exception as e:
         print(e)
         resSess.rollback()
         return Response(status=500)  # 500 = codice di errore
-

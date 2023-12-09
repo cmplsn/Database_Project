@@ -52,20 +52,18 @@ CREATE TABLE "projects"
     "uuid"        UUID DEFAULT uuid_generate_v4(),
     "title"       VARCHAR NOT NULL,
     "description" TEXT,
-    "status"      evaluations_enum DEFAULT 'modificare',
+    "status"      evaluations_enum DEFAULT 'sottomessoperval',
     PRIMARY KEY ("uuid")
 );
 
 CREATE TABLE "messages"
 (
     "uuid"             UUID DEFAULT uuid_generate_v4(),
-    "object"           VARCHAR NOT NULL,
-    "text"             TEXT,
+    "sender"           BOOLEAN NOT NULL,
+    "text"             TEXT NOT NULL,
     "date"             TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    "ResearcherUuid"   UUID,
     "ProjectUuid"      UUID,
-    PRIMARY KEY ("uuid", "ResearcherUuid", "ProjectUuid"),
-    FOREIGN KEY ("ResearcherUuid") REFERENCES "researchers" ("userUuid") ON DELETE CASCADE,
+    PRIMARY KEY ("uuid", "ProjectUuid"),
     FOREIGN KEY ("ProjectUuid") REFERENCES "projects" ("uuid") ON DELETE CASCADE
 );
 
@@ -142,7 +140,7 @@ GRANT INSERT, SELECT , UPDATE ON "users", "projects", "evaluators", "reports" TO
 GRANT USAGE ON SCHEMA project_schema TO ev_role;
 
 ---res_role:
-GRANT SELECT  ON "reports", "evaluators" TO res_role;
-GRANT INSERT, SELECT  ON "messages", "authors", "files" TO res_role;
-GRANT INSERT, SELECT , UPDATE ON "researchers", "projects", "users", "versions" TO res_role;
+GRANT SELECT  ON "reports", "evaluators", "users" TO res_role;
+GRANT INSERT, SELECT ON "messages" TO res_role;
+GRANT ALL ON "authors", "files", "researchers", "projects", "versions" TO res_role;
 GRANT USAGE ON SCHEMA project_schema TO res_role;

@@ -145,13 +145,13 @@
                     <input name="surname" type="text" id="surname" required>
                 </div>
                 <div>
-                    <label for="dateofbirth">Date of Birth:</label>
-                    <input name="dateofbirth" type="text" id="dateofbirth" required>
+                    <label for="birthdate">Date of Birth:</label>
+                    <input name="birthdate" type="text" id="birthdate" required>
                     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/datepicker.min.js"></script>
                     <script>
                         $(document).ready(function(){
-                            $('#dateofbirth').datepicker({
+                            $('#birthdate').datepicker({
                                 format: 'yyyy-mm-dd',
                                 autoHide: true
                             });
@@ -167,7 +167,7 @@
                     <input name="password" type="password" id="password" required>
                 </div>
                 <div>
-                    <label for="cv">Curriculum Vitae (PDF):</label> <!-- Modifica: Aggiunto campo per l'upload di file PDF -->
+                    <label for="cv">Curriculum Vitae (PDF):</label>
                     <input type="file" name="cv" id="cv" accept=".pdf" required>
                 </div>
 

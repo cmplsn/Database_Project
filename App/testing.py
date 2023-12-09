@@ -17,7 +17,10 @@ def populate_database():
         # Create a researcher user
         researcher_user = Researcher(name='Researcher', surname='User', email='res',
                                      password='pwd', birthdate=datetime.now(), cv=b'cv_data')
+        researcher_user1 = Researcher(name='Researcher', surname='User', email='ress',
+                                     password='pwd', birthdate=datetime.now(), cv=b'cv_data')
         adminSess.add(researcher_user)
+        adminSess.add(researcher_user1)
         adminSess.commit()
         # Create an evaluator user
         evaluator_user = Evaluator(name='Evaluator', surname='User', email='ev',
@@ -36,9 +39,18 @@ def populate_database():
 
         # Create an author association between researcher and project
         # Create a message related to the project
-        message = Message(object='Sample Message', text='This is a sample message', date=datetime.now(),
-                          ResearcherUuid=researcher_user.uuid, ProjectUuid=project.uuid)
+        message = Message(sender=False, text='This is a sample message by val', date=datetime.now(),
+                          ProjectUuid=project.uuid)
+        message1 = Message(sender=True, text='This is a sample message by res', date=datetime.now(),
+                           ProjectUuid=project.uuid)
+        message3 = Message(sender=False, text='This is a sample responce by val', date=datetime.now(),
+                           ProjectUuid=project.uuid)
+        message4 = Message(sender=True, text='This is a sample responce by res', date=datetime.now(),
+                           ProjectUuid=project.uuid)
         adminSess.add(message)
+        adminSess.add(message1)
+        adminSess.add(message3)
+        adminSess.add(message4)
         adminSess.commit()
         # Create a file related to the project
         file_data = File(title='Sample File', ProjectUuid=project.uuid)

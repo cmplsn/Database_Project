@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project</title>
+    <title>Chat App</title>
     <style>
+
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f4f4f4;
@@ -35,13 +35,6 @@
             justify-content: space-between;
         }
 
-        table {
-            width: 100%;
-            text-align: center;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
         form {
             background-color: #fff;
             padding: 20px;
@@ -65,67 +58,220 @@
         }
 
         input[type="submit"],
-        input[type="file"] {
+        input[type="file"],
+        button {
             background-color: #007bff;
             color: #fff;
             cursor: pointer;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
         }
-    </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/datepicker.min.css">
-</head>
 
+        #messages-container {
+    max-height: 300px; /* Imposta l'altezza massima desiderata per il contenitore dei messaggi */
+    overflow-y: auto; /* Abilita la barra di scorrimento verticale quando supera l'altezza massima */
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            margin: 20px;
+        }
+
+        .message {
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 8px;
+            max-width: 70%;
+            clear: both;
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background-color: #e0e0e0;
+        }
+
+        .message-time {
+            font-size: 12px;
+            color: #000;
+            margin-bottom: 5px;
+        }
+    #send-button {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
 <body>
     <header>
-        <h1>prj.title</h1>
+        <h1>{{ prj.title }}</h1>
+        <h2>{{ prj.description }}</h2>
     </header>
-    <h2>prj.description</h2>
     <main>
-<div style="margin-left:20px">
-    <h2>Lista di Files</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Title</th>
-                <th>Remove</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in open_projects %}
-                <tr>
-                    {% for value in row %}
-                        {% if loop.index0 == 1 %}
-                            <td><a href="{{ url_for('nome_pagina_di_destinazione', uuid=row.uuid) }}">{{ value }}</a></td>
-                        {% else %}
-                            <td>{{ value }}</td>
-                        {% endif %}
+        <div style="margin-left:20px">
+            <h2>Lista di Files</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Remove</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in files %}
+                        <tr>
+                            {% for value in row %}
+                                {% if loop.index0 == 1 %}
+                                    <td>
+                                        <a href="{{ url_for('file_route.file_page', uuid_file=row[0]) }}">{{ value }}</a>
+                                    </td>
+                                {% else %}
+                                {% endif %}
+                            {% endfor %}
+                            <td>
+                                <form action="{{ url_for('prj_route.prj_private', prj_id=prj.uuid) }}" method="post">
+                                    <input type="hidden" name="action" value="elimina">
+                                    <button type="submit" name="elimina_file" value="{{ row[0] }}">Elimina</button>
+                                </form>
+                            </td>
+                        </tr>
                     {% endfor %}
-                    <td>
-                        <form action="{{ url_for('prj_route.prj_private') }}" method="post">
-                            <input type="hidden" name="action" value="elimina">
-                            <button type="submit" name="elimina_file" value="{{ row.uuid }}">Elimina</button>
-                        </form>
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-        <div>
-            <h2>Messages</h2>
-            <form method="post">
-                <input type="hidden" name="action" value="aggiungi">
-                <div>
-                    <label for="title">Title:</label>
-                    <input name="title" type="text" id="title" required>
-                </div>
-                <div>
-                    <label for="description">Description:</label>
-                    <input name="description" type="text" id="description" required>
-                </div>
-                <input type="submit" value="Add">
-            </form>
+                </tbody>
+            </table>
         </div>
-</div>>
+        <div>
+        <h2>Crea nuovo File</h2>
+        <form method="post" id="FileForm">
+            <input type="hidden" name="action" value="aggiungi">
+            <div>
+                <label for="title">Title:</label>
+                <input name="title" type="text" id="title" required>
+            </div>
+            <input type="submit" value="Add">
+        </form>
+    </div>
+        <div>
+            <h2>Messaggi</h2>
+            <div id="chat-container">
+                <div id="messages-container" class="message-container"></div>
+                <form id="message-form" class="message-container">
+                    <input type="text" id="message-input" placeholder="Type your message...">
+                    <input type="button" id="send-button" value="Send">
+                </form>
+            </div>
+        </div>
     </main>
-</body>
+<script>
+     document.addEventListener('DOMContentLoaded', function () {
+        const messagesContainer = document.getElementById('messages-container');
+        const messageForm = document.getElementById('message-form');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
 
+        const messages = {{ mex | tojson | safe }};
+
+        function renderMessages() {
+            messagesContainer.innerHTML = '';
+
+            messages.forEach(message => {
+                const messageElement = document.createElement('div');
+                messageElement.classList.add('message');
+
+                const messageTimeElement = document.createElement('div');
+                messageTimeElement.classList.add('message-time');
+                messageTimeElement.textContent = formatMessageTime(message[1]);
+                messageElement.appendChild(messageTimeElement);
+
+                const messageContentElement = document.createElement('div');
+                messageContentElement.classList.add('message-content');
+                messageContentElement.innerHTML = message[0];
+                messageElement.appendChild(messageContentElement);
+
+                // Aggiungi la classe "sent" se il messaggio è stato inviato dall'utente
+                if (message[2]) {
+                    messageElement.classList.add('sent');
+                } else {
+                    // Altrimenti, aggiungi la classe "received"
+                    messageElement.classList.add('received');
+                }
+
+                messagesContainer.appendChild(messageElement);
+            });
+
+            // Scroll to the bottom of the messages container
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function formatMessageTime(timestamp) {
+            const date = new Date(timestamp);
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${hours}:${minutes}`;
+        }
+
+        function sendMessage() {
+    const text = messageInput.value.trim();
+    if (text !== '') {
+        const sender = true; // Assuming the sender is the user (you may need to adjust this)
+        const timestamp = new Date().toISOString();
+        messages.push([text, timestamp, sender]);
+        messageInput.value = '';
+        renderMessages();
+
+        // Invia il messaggio al server Flask
+        fetch("{{ url_for('prj_route.prj_private', prj_id=prj.uuid) }}", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                text: text,
+                timestamp: timestamp,
+                sender: sender,
+            }),
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Server response:', data);
+            // Puoi gestire ulteriori azioni in base alla risposta del server, se necessario
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
+    }
+}
+
+
+        sendButton.addEventListener('click', sendMessage);
+        messageForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            sendMessage();
+        });
+
+        // Initial rendering of messages
+        renderMessages();
+    });
+</script>
+</body>
 </html>

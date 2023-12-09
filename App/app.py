@@ -7,10 +7,11 @@ from flask_smorest import *
 # from flask_security import Security
 # from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import *
-from App.resourches.Evaluetor import eval_route
+from resourches.Evaluetor import eval_route
+from resourches.File import file_route
 from resourches.Project import prj_route
-from App.db import *
-from App.models import *
+from db import *
+from models import *
 from resourches.Admin import admin_route
 from resourches.Researcher import res_route
 from testing import populate_database
@@ -28,6 +29,8 @@ app.register_blueprint(admin_route)
 app.register_blueprint(res_route)
 app.register_blueprint(prj_route)
 app.register_blueprint(eval_route)
+app.register_blueprint(file_route)
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -69,8 +72,28 @@ def load_user(user_id):
 
 @app.route('/')
 def home():  # put application's code here
-    print('sono entrato in home()')
-    return redirect(url_for('login'))
+
+    return redirect(url_for('registration'))
+
+@app.route('/registration', methods=['GET', 'POST'])
+def registration():
+    try:
+        if request.method == 'POST':
+            print(request.form['birthdate'])
+            print(datetime.strptime(request.form['birthdate'], '%Y-%m-%d'))
+            birthdate = datetime.strptime(request.form['birthdate'], '%Y-%m-%d')
+            new_res = Researcher(name=request.form['name'], surname=request.form['surname'],
+                                 email=request.form['email'], birthdate=birthdate, password=request.form['password'],
+                                 cv=request.files['cv'].read())
+            adminSess.add(new_res)
+            adminSess.commit()
+            return redirect(url_for('login'))
+        else:
+            return render_template("registration.html")
+    except Exception as e:
+        print(e)
+        adminSess.rollback()
+    return Response(status=500)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -86,7 +109,7 @@ def login():
             # Verifica se User è presente in db "USER"
             user = evSess.execute(select(User).where(User.email == request.form['email'])).fetchone()
             if user is None:
-                return render_template('home.html', login_error=True)
+                return render_template('Login.html', login_error=True)
             adm = adminSess.execute(select(Admin).where(Admin.userUuid == user[0].uuid)).fetchone()
             print(adm)
             ev = evSess.execute(select(Evaluator).where(Evaluator.userUuid == user[0].uuid)).fetchone()
@@ -99,7 +122,7 @@ def login():
                     login_user(adm.Admin)
                     return redirect(url_for('admin_route.admin'))
                 else:
-                    return render_template('home.html', login_error=True)
+                    return render_template('Login.html', login_error=True)
             elif ev is not None:
                 # Controlla se login è di tipo Evaluator
                 ev = ev.Evaluator
@@ -108,7 +131,7 @@ def login():
                     login_user(ev)
                     return redirect(url_for('eval_route.eval_files'))
                 else:
-                    return render_template('home.html', login_error=True)
+                    return render_template('Login.html', login_error=True)
             elif res is not None:
                 # controlla se login è di tipo Researcher
                 res = res.Researcher
@@ -117,18 +140,18 @@ def login():
                     login_user(res)
                     return redirect(url_for('res_route.res_private'))
                 else:
-                    return render_template('home.html', login_error=True)
+                    return render_template('Login.html', login_error=True)
             else:
-                return render_template('home.html', login_error=True)
+                return render_template('Login.html', login_error=True)
         except Exception as e:
             print(e)
             evSess.rollback()
-        return render_template("home.html")
+        return render_template("Login.html")
     else:
         if current_user.is_authenticated:
             return redirect(url_for('private'))
         else:
-            return render_template('home.html')
+            return render_template('Login.html')
 
 
 @app.route('/private')
@@ -141,7 +164,7 @@ def private():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('home'))
+    return redirect(url_for('login'))
 
 
 def init_database():
