@@ -149,3 +149,58 @@ as
 create trigger report_del before delete on reports
     for each row
     execute function report_del();
+
+
+-- IMPEDIRE INSERT O UPDATE DI FILE DI FILE CON STESSO TITOLO E STESSO "ProjectUuid"
+CREATE function file_title() returns trigger
+language plpgsql
+as
+$$
+    begin
+        if (new.title IN (Select title from files where title=new.title AND new."ProjectUuid"="ProjectUuid"))then
+            return null;
+        end if;
+        return new;
+    end;
+$$;
+
+create trigger file_title before insert or update on files
+    for each row
+    execute function file_title();
+
+
+-- IMPEDIRE INSERT O UPDATE DI VERSIONI CON STESSA VERSIONE SE HANNO STESSO "FileUuid"
+create function versions_number() returns trigger
+language plpgsql
+as
+$$
+    begin
+        if(new.version IN(Select version from versions where "FileUuid"=new."FileUuid")) then
+            return null;
+        end if;
+        return new;
+    end;
+$$;
+
+create trigger versions_number before insert or update on versions
+    for each row
+    execute function versions_number();
+
+-- impedisce inserimento o update in messages se il ricercatore inserito in messages 
+-- non è autore del progetto su cui si sta inserendo il messaggio
+
+create function message_author_res() returns trigger
+language plpgsql
+as
+$$
+    begin
+        if(new."ResearcherUuid"<>(select authors."ResearcherUuid" from authors where "ProjectUuid"=new."ProjectUuid"))
+            then return null;
+        end if;
+        return new;
+    end;
+$$;
+
+create trigger mes_author_res before insert or update on messages
+    for each row
+    execute function message_author_res();

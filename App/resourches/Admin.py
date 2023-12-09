@@ -30,9 +30,9 @@ def admin():
             return redirect(url_for('admin_route.admin'))
         else:  # Aggiungi Evaluator
             try:
-                dateofbirth = datetime.strptime(request.form['dateofbirth'], '%Y-%m-%d')
+                birthdate = datetime.strptime(request.form['birthdate'], '%Y-%m-%d')
                 new_eval = Evaluator(name=request.form['name'], surname=request.form['surname'],
-                                     email=request.form['email'], birthdate=dateofbirth, password=request.form['password'], cv=request.files['cv'].read())
+                                     email=request.form['email'], birthdate=birthdate, password=request.form['password'], cv=request.files['cv'].read())
                 adminSess.add(new_eval)
                 adminSess.commit()
             except Exception as e:

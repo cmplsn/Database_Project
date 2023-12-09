@@ -33,7 +33,35 @@
             box-sizing: border-box;
             justify-content: space-between; /* Modifica: sposta a destra il form di aggiunta */
         }
-        </style>
+        /* Stili personalizzati per datepicker */
+        .datepicker {
+            font-family: 'Arial', sans-serif;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .datepicker--nav {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .datepicker--cell {
+            color: #333;
+        }
+
+        .datepicker--cell:hover {
+            background-color: #007bff;
+            color: #fff;
+        }
+
+        .datepicker--cell-day {
+            padding: 10px;
+        }
+    </style>
+    <!-- Includi il CSS di datepicker -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/datepicker.min.css">
+
 </head>
 <body>
 <header>Registration</header>
@@ -50,13 +78,13 @@
                     <input name="surname" type="text" id="surname" required>
                 </div>
                 <div>
-                    <label for="dateofbirth">Date of Birth:</label>
-                    <input name="dateofbirth" type="text" id="dateofbirth" required>
+                    <label for="birthdate">Date of Birth:</label>
+                    <input name="birthdate" type="text" id="birthdate" required>
                     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
                     <script src="https://cdnjs.cloudflare.com/ajax/libs/datepicker/1.0.10/datepicker.min.js"></script>
                     <script>
                         $(document).ready(function(){
-                            $('#dateofbirth').datepicker({
+                            $('#birthdate').datepicker({
                                 format: 'yyyy-mm-dd',
                                 autoHide: true
                             });
@@ -71,9 +99,14 @@
                     <label for="password">Password:</label>
                     <input name="password" type="password" id="password" required>
                 </div>
+                <div>
+                    <label for="cv">Curriculum Vitae (PDF):</label>
+                    <input type="file" name="cv" id="cv" accept=".pdf" required>
+                </div>
                 <input type="submit" value="Add">
             </form>
         </div>
 </main>
 <a href='/login'>Sei già registrato? Effettua il login</a>
 </body>
+</html>

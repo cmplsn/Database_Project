@@ -73,17 +73,21 @@ def home():  # put application's code here
 
     return redirect(url_for('registration'))
 
-@app.route('/registration')
+@app.route('/registration', methods=['GET', 'POST'])
 def registration():
     try:
         if request.method == 'POST':
-            dateofbirth = datetime.strptime(request.form['dateofbirth'], '%Y-%m-%d')
+            print(request.form['birthdate'])
+            print(datetime.strptime(request.form['birthdate'], '%Y-%m-%d'))
+            birthdate = datetime.strptime(request.form['birthdate'], '%Y-%m-%d')
             new_res = Researcher(name=request.form['name'], surname=request.form['surname'],
-                                 email=request.form['email'], birthdate=dateofbirth, password=request.form['password'],
+                                 email=request.form['email'], birthdate=birthdate, password=request.form['password'],
                                  cv=request.files['cv'].read())
             adminSess.add(new_res)
             adminSess.commit()
             return redirect(url_for('login'))
+        else:
+            return render_template("registration.html")
     except Exception as e:
         print(e)
         adminSess.rollback()
