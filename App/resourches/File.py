@@ -15,14 +15,31 @@ def file_page(uuid_file):
         if request.method == 'GET':
             # TODO: Aggiungere controllo se l'utente ha accesso a quel file
             file = resSess.execute(select(File).where(File.uuid == uuid_file)).fetchone().File
-            print("AAAAA")
-            print(file.versions[0].reports)
             return render_template('File.html', file=file)
         elif request.method == 'POST':
-            new_prj = Project(title=request.form['title'], description=request.form['description'])
-            resSess.add(new_prj)
+            resSess.add(Version(submitted=datetime.now(), FileUuid=uuid_file, details=request.form['details'], version=request.form['version'], file=request.files['newVersion'].read()))
             resSess.commit()
+            return redirect(url_for('res_route.file_page'))
     except Exception as e:
         print(e)
         resSess.rollback()
-    return Response(status=500)
+        return Response(status=500)
+
+
+@file_route.route('/get_version/<file_uuid>/<version_uuid>', methods=['GET'])
+def get_pdf(file_uuid, version_uuid):
+    try:
+            # TODO: Aggiungere controllo se l'utente ha accesso a quel file
+            ver = resSess.execute(select(Version).where(Version.uuid == version_uuid)).fetchone()
+            binary_pdf = ver.Version.file
+            response = make_response(binary_pdf)
+            response.headers['Content-Type'] = 'application/pdf'
+            response.headers['Content-Disposition'] = \
+                'inline; filename=%s.pdf' % 'yourfilename'
+            return response
+
+            #return render_template('File.html', file=file)
+    except Exception as e:
+        print(e)
+        resSess.rollback()
+        return Response(status=500)
