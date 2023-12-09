@@ -100,18 +100,26 @@
                     {% for row in open_projects %}
                         <tr>
                             {% for value in row %}
-                                <td>{{ value }}</td>
+                                {% if loop.index0 == 1 %}
+                                    <td>
+                                        <a href="{{ url_for('prj_route.prj_private', prj_id=row[0]) }}">{{ value }}</a>
+                                    </td>
+                                {% elif loop.index0 == 2 %}
+                                    <td>{{ value }}</td>
+                                {% else %}
+                                    {# Gestisci altri casi se necessario #}
+                                {% endif %}
                             {% endfor %}
                             <td>
-                                <form action="{{ url_for('prj_route.prj_private') }}" method="post">
+                                <form action="{{ url_for('res_route.res_private') }}" method="post">
                                     <input type="hidden" name="action" value="submit_to_val">
-                                    <button type="submit" name="submit_to_val" value="{{ row.uuid }}">Submit</button>
+                                    <button type="submit" name="submit_to_val" value="{{ row[0] }}">Submit</button>
                                 </form>
                             </td>
                             <td>
                                 <form action="{{ url_for('res_route.res_private') }}" method="post">
                                     <input type="hidden" name="action" value="elimina">
-                                    <button type="submit" name="elimina_project" value="{{ row.uuid }}">Elimina</button>
+                                    <button type="submit" name="elimina_project" value="{{ row[0] }}">Elimina</button>
                                 </form>
                             </td>
                         </tr>
@@ -127,6 +135,7 @@
                         {% for column_name in column_names %}
                             <th>{{ column_name }}</th>
                         {% endfor %}
+                        <th>Submit</th>
                         <th>Remove</th>
                     </tr>
                 </thead>
@@ -134,18 +143,22 @@
                     {% for row in approved_projects %}
                         <tr>
                             {% for value in row %}
-                                {% if loop.index0 != 0 %}
-                                    {% if loop.index0 == 1 %}
-                                        <td><a href="{{ url_for('prj_route.prj_private', prj_id=row.uuid) }}">{{ value }}</a></td>
-                                    {% else %}
-                                        <td>{{ value }}</td>
-                                    {% endif %}
+                                {% if loop.index0 == 1 %}
+                                    <td><a href="{{ url_for('prj_route.prj_private', prj_id=row[0]) }}">{{ value}}</a></td>
+                                {% elif loop.index0 == 2 %}
+                                    <td>{{ value }}</td>
                                 {% endif %}
                             {% endfor %}
                             <td>
                                 <form action="{{ url_for('res_route.res_private') }}" method="post">
+                                    <input type="hidden" name="action" value="submit_to_val">
+                                    <button type="submit" name="submit_to_val" value="{{ row[0] }}">Submit</button>
+                                </form>
+                            </td>
+                            <td>
+                                <form action="{{ url_for('res_route.res_private') }}" method="post">
                                     <input type="hidden" name="action" value="elimina">
-                                    <button type="submit" name="elimina_project" value="{{ row.uuid }}">Elimina</button>
+                                    <button type="submit" name="elimina_project" value="{{ row[0] }}">Elimina</button>
                                 </form>
                             </td>
                         </tr>
