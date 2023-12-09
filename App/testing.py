@@ -17,7 +17,10 @@ def populate_database():
         # Create a researcher user
         researcher_user = Researcher(name='Researcher', surname='User', email='res',
                                      password='pwd', birthdate=datetime.now(), cv=b'cv_data')
+        researcher_user1 = Researcher(name='Researcher', surname='User', email='ress',
+                                     password='pwd', birthdate=datetime.now(), cv=b'cv_data')
         adminSess.add(researcher_user)
+        adminSess.add(researcher_user1)
         adminSess.commit()
         # Create an evaluator user
         evaluator_user = Evaluator(name='Evaluator', surname='User', email='ev',

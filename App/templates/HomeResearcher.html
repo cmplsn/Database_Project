@@ -228,19 +228,40 @@
             const emailArray = Array.from(document.querySelectorAll("input[name='authors[]']"))
                 .map(input => input.value);
 
-            // Puoi fare qualcosa con l'array di email (es. inviarlo a Flask)
-            console.log("Email Array:", emailArray);
+            // Raccolta del titolo e della descrizione
+            const title = document.getElementById("title").value;
+            const description = document.getElementById("description").value;
 
-            // Aggiungere eventuali azioni di invio a Flask qui
-            // Esempio: fetch('url_del_tuo_endpoint', { method: 'POST', body: JSON.stringify({ emails: emailArray }), headers: { 'Content-Type': 'application/json' } })
-            // .then(response => response.json())
-            // .then(data => console.log(data));
+            // Creazione dell'oggetto JSON con tutte le informazioni
+            const formData = {
+                title: title,
+                description: description,
+                emails: emailArray
+            };
 
-            // Rendi il form visibile nella console per analisi approfondita
-            console.log("Form Submitted!");
+            // Puoi fare qualcosa con l'oggetto JSON (es. Inviarlo a Flask)
+            console.log("Form Data:", formData);
 
-            // Rimuovi questo blocco se vuoi far sì che il form venga inviato regolarmente
-            // form.submit();
+            fetch('/res_private', {
+                method: 'POST',
+                body: JSON.stringify(formData),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Server response:', data);
+            if (data.status === 'success') {
+                location.reload();
+            }
+        })
+        .catch(error => {
+            console.error('There was a problem with the fetch operation:', error);
+        });
         });
     });
 </script>
