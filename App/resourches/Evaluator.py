@@ -43,7 +43,7 @@ def eval_page():  # Pagina principale dell'area riservata del valutatore
             elif request.path == '/eval_page':
                 # Invio di un messaggio
                 data = request.get_json()
-                prj_uuid = request.form['id-prj']
+                prj_uuid = data['projectId']
                 mess = Message(sender=not data['sender'], text=data['text'], date=data['timestamp'],
                                ProjectUuid=prj_uuid)
                 evSess.add(mess)

@@ -184,7 +184,7 @@
         const messagesContainer = document.getElementById('messages-container');
         const messageForm = document.getElementById('message-form');
         const messageInput = document.getElementById('message-input');
-        const projectId = document.getElementById('id-prj');
+        const projectId = document.getElementById('id-prj').value;
         const sendButton = document.getElementById('send-button');
 
         const messages = {{ mex | tojson | safe }};
@@ -233,6 +233,7 @@
     if (text !== '') {
         const sender = true; // Assuming the sender is the user (you may need to adjust this)
         const timestamp = new Date().toISOString();
+
         messages.push([text, timestamp, sender]);
         messageInput.value = '';
         renderMessages();
@@ -247,7 +248,7 @@
                 text: text,
                 timestamp: timestamp,
                 sender: sender,
-                prj_id: projectId,
+                projectId: projectId,
             }),
         })
         .then(response => {
