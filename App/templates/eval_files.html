@@ -78,24 +78,26 @@
             </a>
         </div>
 </header>
-<h3>Lista file non approvati</h3>
+<h3>Lista file</h3>
 <table>
     <tr>
         <th>Titolo</th>
         <th>Scarica</th>
-        <th>Inserisci report</th>
+        <th>Inserisci descrizione</th>
+        <th>Carica report</th>
         <th>Salva</th>
     </tr>
     {% for file in project.files %}
 
         {% if file.getLastVersion() != none and file.getLastVersion().Version.reports == [] %}
             <tr>
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     <input type="hidden" name="fileUuid" value="{{ file.uuid }}">
                     <input type="hidden" name="versionUuid" value="{{ file.getLastVersion().Version.uuid }}">
                     <th>{{ file.title }}</th>
                     <th><a href="/get_version/{{ file.uuid }}/{{ file.getLastVersion().Version.uuid }}">Apri</a></th>
                     <th><input type="text" name="report" id="report" required></th>
+                    <th><input type="file" name="newreport" id="newreport" name="Carica"></th>
                     <th><input type="submit"></th>
                 </form>
             </tr>
@@ -107,7 +109,8 @@
     <tr>
         <th>Titolo</th>
         <th>Scarica</th>
-        <th>Inserisci report</th>
+        <th>Descrizione</th>
+        <th>Report</th>
     </tr>
     {% for file in project.files %}
 
@@ -116,6 +119,7 @@
                 <th>{{ file.title }}</th>
                 <th><a href="/get_version/{{ file.uuid }}/{{ file.getLastVersion().Version.uuid }}">Apri</a></th>
                 <th>{{ file.getLastVersion().Version.reports[0].description }}</th>
+                <th><a href="/get_report/{{ file.uuid }}/{{ file.getLastVersion().Version.reports[0].uuid }}">Apri</a></th>
             </tr>
         {% endif %}
     {% endfor %}

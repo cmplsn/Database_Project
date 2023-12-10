@@ -141,14 +141,7 @@
                 <tbody>
                     {% for row in projects %}
                         <tr>
-                                <td>{{ row[1] }}</td>
-
-                            <td>
-                                <form action="{{ url_for('eval_route.eval_page') }}" method="post">
-                                    <input type="hidden" name="action" value="vai_ai_files">
-                                    <button type="submit" name="messages" value="{{ row[0] }}">Files</button>
-                                </form>
-                            </td>
+                                <td><a href="{{ url_for('eval_route.eval_files', uuid_project=row[0]) }}">{{ row[1] }}</a></td>
                         <td>
                                 <form action="{{ url_for('eval_route.eval_page') }}" method="post">
                                     <input type="hidden" name="action" value="messages">
@@ -156,14 +149,18 @@
                                 </form>
                             </td>
                         <th>
-                        <select id="status" name="status" required>
-                            <option value="" disabled selected></option>
-                          <option value="approvato">approvato</option>
-                          <option value="sottomessoperval">Sottomesso per valutazione</option>
-                          <option value="modificare">modificare</option>
-                          <option value="nonapprovato">Non approvato</option>
-                        </select>
-                            <input type="button" id="status-button" value="Send">
+                        <form action="{{ url_for('eval_route.eval_page') }}" method="post">
+                            <input type="hidden" name="action" value="status">
+                            <select id="status" name="status" required>
+                                <option value="" disabled selected></option>
+                                <option value="APPROVATO">Approvato</option>
+                                <option value="SOTTOMESSO PER VALUTAZIONE">Sottomesso per valutazione</option>
+                                <option value="MODIFICARE">Modificare</option>
+                                <option value="NON APPROVATO">Non approvato</option>
+                            </select>
+                            <input type="hidden" name="id_prg" value="{{ row[0] }}">
+                            <input type="submit" name="status" value="Send">
+                        </form>
                         </th>
                         </tr>
                     {% endfor %}
@@ -233,7 +230,6 @@
 
         function sendMessage() {
     const text = messageInput.value.trim();
-    const projectId = projectId.value
     if (text !== '') {
         const sender = true; // Assuming the sender is the user (you may need to adjust this)
         const timestamp = new Date().toISOString();
@@ -251,7 +247,7 @@
                 text: text,
                 timestamp: timestamp,
                 sender: sender,
-                prjid: projectId
+                prj_id: projectId,
             }),
         })
         .then(response => {

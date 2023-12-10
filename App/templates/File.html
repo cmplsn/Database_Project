@@ -85,6 +85,7 @@
     <tr>
         <th>Versione</th>
         <th>Data di sottomissione</th>
+        <th>Dettagli</th>
         <th>Report</th>
     </tr>
     {% for version in file.versions %}
@@ -93,6 +94,7 @@
                 <a href="/get_version/{{ file.uuid }}/{{ version.uuid }}"> <p>{{ version.version }}</p> </a>
             </th>
             <th><p>{{ version.submitted }}<p></th>
+            <th><p>{{ version.details }}<p></th>
             <th>{% if version.getLastReport() != none %}
                 <p>{{ version.getLastReport().Report.description }}<p>
                 {% else %}

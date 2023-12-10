@@ -238,9 +238,10 @@ class Report(db.Model):
     submitted = Column(DateTime, default=datetime.now())
     version = relationship("Version", back_populates="reports")
 
-    def __init__(self, description: Text, EvaluatorUuid: UUID, VersionsUuid: UUID, uuid: UUID = null):
+    def __init__(self, description: Text, EvaluatorUuid: UUID, VersionsUuid: UUID, file: LargeBinary, uuid: UUID = null):
         self.description = description
         self.EvaluatorUuid = EvaluatorUuid
+        self.file = file
         self.VersionsUuid = VersionsUuid
 
         if uuid != null:

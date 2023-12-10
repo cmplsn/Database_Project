@@ -18,7 +18,7 @@ def file_page(uuid_file):
         elif request.method == 'POST':
             resSess.add(Version(submitted=datetime.now(), FileUuid=uuid_file, details=request.form['details'], version=request.form['version'], file=request.files['newVersion'].read()))
             resSess.commit()
-            return redirect(url_for('file_route.file_page'), uuid_file)
+            return redirect('/file_page/' + uuid_file)
     except Exception as e:
         print(e)
         resSess.rollback()
@@ -35,8 +35,7 @@ def get_pdf(file_uuid, version_uuid):
             response.headers['Content-Type'] = 'application/pdf'
             response.headers['Content-Disposition'] = \
                 'inline; filename=%s.pdf' % 'yourfilename'
-
-            return render_template('File.html', file=file)
+            return response
     except Exception as e:
         print(e)
         resSess.rollback()
