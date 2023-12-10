@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App</title>
+    <title>HomeEvaluator</title>
     <style>
 
         body {
@@ -120,8 +120,7 @@
 </head>
 <body>
     <header>
-        <h1>{{ prj.title }}</h1>
-        <h2>{{ prj.description }}</h2>
+       <h1>Ciao {{ user_name }}</h1>
         <div class="d-flex align-items-center col-auto">
             <a href="/logout" class="btn btn-link px-3 me-2">
                 Logout
@@ -130,53 +129,54 @@
     </header>
     <main>
         <div style="margin-left:20px">
-            <h2>Lista di Files</h2>
+            <h2>Progetti da approvare</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>Title</th>
-                        <th>Remove</th>
+                        {% for column_name in column_names %}
+                            <th>{{ column_name }}</th>
+                        {% endfor %}
                     </tr>
                 </thead>
                 <tbody>
-                    {% for row in files %}
+                    {% for row in projects %}
                         <tr>
-                            {% for value in row %}
-                                {% if loop.index0 == 1 %}
-                                    <td>
-                                        <a href="{{ url_for('file_route.file_page', uuid_file=row[0]) }}">{{ value }}</a>
-                                    </td>
-                                {% else %}
-                                {% endif %}
-                            {% endfor %}
+                                <td>{{ row[1] }}</td>
+
                             <td>
-                                <form action="{{ url_for('prj_route.prj_private', prj_id=prj.uuid) }}" method="post">
-                                    <input type="hidden" name="action" value="elimina">
-                                    <button type="submit" name="elimina_file" value="{{ row[0] }}">Elimina</button>
+                                <form action="{{ url_for('eval_route.eval_page') }}" method="post">
+                                    <input type="hidden" name="action" value="vai_ai_files">
+                                    <button type="submit" name="messages" value="{{ row[0] }}">Files</button>
                                 </form>
                             </td>
+                        <td>
+                                <form action="{{ url_for('eval_route.eval_page') }}" method="post">
+                                    <input type="hidden" name="action" value="messages">
+                                    <button type="submit" name="messages" value="{{ row[0] }}" data-project-id="{{ row[0] }}">Messages</button>
+                                </form>
+                            </td>
+                        <th>
+                        <select id="status" name="status" required>
+                            <option value="" disabled selected></option>
+                          <option value="approvato">approvato</option>
+                          <option value="sottomessoperval">Sottomesso per valutazione</option>
+                          <option value="modificare">modificare</option>
+                          <option value="nonapprovato">Non approvato</option>
+                        </select>
+                            <input type="button" id="status-button" value="Send">
+                        </th>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
         <div>
-        <h2>Crea nuovo File</h2>
-        <form method="post" id="FileForm">
-            <input type="hidden" name="action" value="aggiungi">
-            <div>
-                <label for="title">Title:</label>
-                <input name="title" type="text" id="title" required>
-            </div>
-            <input type="submit" value="Add">
-        </form>
-    </div>
-        <div>
             <h2>Messaggi</h2>
             <div id="chat-container">
                 <div id="messages-container" class="message-container"></div>
                 <form id="message-form" class="message-container">
                     <input type="text" id="message-input" placeholder="Type your message...">
+                    <input type="hidden" id="id-prj" value="{{ prj_id }}">
                     <input type="button" id="send-button" value="Send">
                 </form>
             </div>
@@ -187,6 +187,7 @@
         const messagesContainer = document.getElementById('messages-container');
         const messageForm = document.getElementById('message-form');
         const messageInput = document.getElementById('message-input');
+        const projectId = document.getElementById('id-prj');
         const sendButton = document.getElementById('send-button');
 
         const messages = {{ mex | tojson | safe }};
@@ -232,6 +233,7 @@
 
         function sendMessage() {
     const text = messageInput.value.trim();
+    const projectId = projectId.value
     if (text !== '') {
         const sender = true; // Assuming the sender is the user (you may need to adjust this)
         const timestamp = new Date().toISOString();
@@ -240,7 +242,7 @@
         renderMessages();
 
         // Invia il messaggio al server Flask
-        fetch("{{ url_for('prj_route.prj_private', prj_id=prj.uuid) }}", {
+        fetch("{{ url_for('eval_route.eval_page') }}", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -249,6 +251,7 @@
                 text: text,
                 timestamp: timestamp,
                 sender: sender,
+                prjid: projectId
             }),
         })
         .then(response => {

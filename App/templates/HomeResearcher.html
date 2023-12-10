@@ -82,6 +82,11 @@
 <body>
     <header>
         <h1>Ciao {{ user_name }}</h1>
+        <div class="d-flex align-items-center col-auto">
+            <a href="/logout" class="btn btn-link px-3 me-2">
+                Logout
+            </a>
+        </div>
     </header>
     <main>
         <div style="margin-left:20px">
@@ -128,19 +133,17 @@
             </table>
         </div>
         <div style="margin-left:20px">
-            <h2>Lista di Approved Projects</h2>
+            <h2>Lista di Closed Projects</h2>
             <table>
                 <thead>
                     <tr>
                         {% for column_name in column_names %}
                             <th>{{ column_name }}</th>
                         {% endfor %}
-                        <th>Submit</th>
-                        <th>Remove</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for row in approved_projects %}
+                    {% for row in closed_projects %}
                         <tr>
                             {% for value in row %}
                                 {% if loop.index0 == 1 %}
@@ -149,18 +152,6 @@
                                     <td>{{ value }}</td>
                                 {% endif %}
                             {% endfor %}
-                            <td>
-                                <form action="{{ url_for('res_route.res_private') }}" method="post">
-                                    <input type="hidden" name="action" value="submit_to_val">
-                                    <button type="submit" name="submit_to_val" value="{{ row[0] }}">Submit</button>
-                                </form>
-                            </td>
-                            <td>
-                                <form action="{{ url_for('res_route.res_private') }}" method="post">
-                                    <input type="hidden" name="action" value="elimina">
-                                    <button type="submit" name="elimina_project" value="{{ row[0] }}">Elimina</button>
-                                </form>
-                            </td>
                         </tr>
                     {% endfor %}
                 </tbody>

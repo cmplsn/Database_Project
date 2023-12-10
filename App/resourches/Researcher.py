@@ -20,13 +20,13 @@ def res_private():
         test = user.projects
         if request.method == 'GET':
             column_names = ["Titolo", "Status"]
-            open_projects = [[prj.uuid, prj.title, prj.status] for prj in test if
+            open_projects = [[prj.uuid, prj.title, EvaluationsEnum.getStringEvaluation(prj.status)] for prj in test if
                              prj.status != EvaluationsEnum.approvato]
-            approved_projects = [[prj.uuid, prj.title, prj.status] for prj in test if
-                                 prj.status == EvaluationsEnum.approvato]
+            closed_projects = [[prj.uuid, prj.title, EvaluationsEnum.getStringEvaluation(prj.status)] for prj in test if
+                                 prj.status == EvaluationsEnum.approvato or prj.status == EvaluationsEnum.nonapprovato]
             return render_template('HomeResearcher.html', user_name=user.name, column_names=column_names,
                                    open_projects=open_projects,
-                                   approved_projects=approved_projects, email_array=email_list)
+                                   closed_projects=closed_projects, email_array=email_list)
         elif request.method == 'POST':
             if request.form.get('action') == "elimina":  # Elimina progetto
                 prj_to_remove = request.form['elimina_project']
@@ -36,9 +36,10 @@ def res_private():
             elif request.form.get('action') == "submit_to_val":  # submit progetto
                 prj_to_update = request.form['submit_to_val']
                 prj = resSess.execute(select(Project).where(Project.uuid == prj_to_update)).fetchone()
+                prj = prj.Project
                 prj.status = EvaluationsEnum.sottomessoperval
                 resSess.commit()
-                return jsonify({'status': 'success'})
+                return redirect(url_for('res_route.res_private'))
             elif request.path == '/res_private':  # Aggiungi progetto
                 data = request.get_json()
                 new_prj = Project(title=data['title'], description=data['description'])
@@ -46,8 +47,8 @@ def res_private():
                 for email in data['emails']:
                     if email != current_user.email:
                         us = resSess.execute(select(Researcher).where(Researcher.email == email)).fetchone()
-                        us = us.Researcher
                         if us:
+                            us = us.Researcher
                             new_prj.researchers.append(us)
                 new_prj.researchers.append(user)
                 resSess.add(new_prj)

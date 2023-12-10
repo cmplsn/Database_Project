@@ -7,10 +7,10 @@ from flask_smorest import *
 # from flask_security import Security
 # from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import *
-from resourches.Evaluetor import eval_route
+from resourches.Evaluator import eval_route
 from resourches.File import file_route
 from resourches.Project import prj_route
-from db import *
+from App.db import *
 from models import *
 from resourches.Admin import admin_route
 from resourches.Researcher import res_route
@@ -54,10 +54,7 @@ def load_user(user_id):
     if admin is not None:
         print('ho trovato Admin')
         return admin.Admin
-
     user = evSess.execute(select(User).where(User.uuid == user_id)).fetchone()
-
-    # todo: chiedere elia perchè messo user = teacherSession(...)
     evaluator = evSess.execute(select(Evaluator).where(Evaluator.userUuid == user[0].uuid)).fetchone()
     if evaluator is None:
         researcher = resSess.execute(select(Researcher).where(Researcher.userUuid == user[0].uuid)).fetchone()
@@ -65,10 +62,6 @@ def load_user(user_id):
             return researcher[0]
     else:
         return evaluator.Evaluator
-    print('finita riga 39 codice')
-
-    # aggiungere ritorna errore di caricamento user
-
 
 @app.route('/')
 def home():  # put application's code here
@@ -129,7 +122,7 @@ def login():
                 print('ho trovato evaluator in login')
                 if ev.auth_pwd(request.form['password']):
                     login_user(ev)
-                    return redirect(url_for('eval_route.eval_files'))
+                    return redirect(url_for('eval_route.eval_page'))
                 else:
                     return render_template('Login.html', login_error=True)
             elif res is not None:
@@ -149,15 +142,14 @@ def login():
         return render_template("Login.html")
     else:
         if current_user.is_authenticated:
-            return redirect(url_for('private'))
+            if isinstance(current_user, Admin):
+                return redirect(url_for('admin_route.admin'))
+            elif isinstance(current_user, Evaluator):
+                return redirect(url_for('eval_route.eval_page'))
+            else:
+                return redirect(url_for('res_route.res_private'))
         else:
             return render_template('Login.html')
-
-
-@app.route('/private')
-@login_required
-def private():
-    return render_template("private.html")
 
 
 @app.route('/logout')

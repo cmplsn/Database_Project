@@ -3,9 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagura File / Report</title></head>
+    <title>Pagina File / Report</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        main {
+            display: flex;
+            width: 100%;
+            box-sizing: border-box;
+            justify-content: space-between; /* Modifica: sposta a destra il form di aggiunta */
+        }
+
+        table {
+            width: 100%; /* Modifica: centra la lista di valutatori */
+            text-align: center;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 300px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"], input[type="file"] {
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
+</head>
 <body>
-<h1>{{ file.title }}</h1>
+<header>
+    <h1>{{ file.title }}</h1>
+            <div class="d-flex align-items-center col-auto">
+            <a href="/logout" class="btn btn-link px-3 me-2">
+                Logout
+            </a>
+        </div>
+</header>
 <p>Progetto: <span id=""> {{ file.project.title }}</span></p>
 <h2>Lista versioni</h2>
 <table>
@@ -17,7 +90,7 @@
     {% for version in file.versions %}
         <tr>
             <th>
-                <a href="/get_version/{{ file.uuid }}/{{ version.uuid }}"> <p>{{ version.version }}<p> </a>
+                <a href="/get_version/{{ file.uuid }}/{{ version.uuid }}"> <p>{{ version.version }}</p> </a>
             </th>
             <th><p>{{ version.submitted }}<p></th>
             <th>{% if version.getLastReport() != none %}

@@ -62,7 +62,7 @@ def populate_database():
         adminSess.add(version)
         adminSess.commit()
         # Create a report related to the evaluator and version
-        report = Report(description='Sample Report', EvaluatorUuid=evaluator_user.userUuid, VersionsUuid=version.uuid)
+        report = Report(description='Sample Report', EvaluatorUuid=evaluator_user.userUuid, VersionsUuid=version.uuid, file=b'report_data')
         adminSess.add(report)
 
         # Commit the changes to the database
