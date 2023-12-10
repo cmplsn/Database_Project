@@ -1,10 +1,7 @@
-import datetime
 import enum
 from datetime import datetime
-
 import bcrypt
 import uuid
-
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, Enum, Date, DateTime, LargeBinary, null, Table, desc, \
@@ -17,21 +14,21 @@ from App.db import Base, resSess
 db = SQLAlchemy()
 
 
-class EvaluationsEnum(enum.Enum):  # todo: capire bene sta cosa degli enum come usarli sia qui che sul DB
+class EvaluationsEnum(enum.Enum):
     approvato = 1
     sottomessoperval = 2
     modificare = 3
     nonapprovato = 4
 
     @staticmethod
-    def getStringEvaluation(enum):
+    def getStringEvaluation(enum):  # Metodo che trasforma da EvaluationsEnum a stringa
         if enum == EvaluationsEnum.approvato: return 'APPROVATO'
         elif enum == EvaluationsEnum.sottomessoperval: return 'SOTTOMESSO PER VALUTAZIONE'
         elif enum == EvaluationsEnum.modificare: return 'MODIFICARE'
         else: return 'NON APPROVATO'
 
     @staticmethod
-    def getEvaluationsEnum(str):
+    def getEvaluationsEnum(str):  # Metodo che trasforma da stringa a EvaluationsEnum
         if str == 'APPROVATO': return EvaluationsEnum.approvato
         elif str == 'SOTTOMESSO PER VALUTAZIONE': return EvaluationsEnum.sottomessoperval
         elif str == 'MODIFICARE': return EvaluationsEnum.modificare
@@ -248,7 +245,6 @@ class Report(db.Model):
             self.uuid = uuid
 
 
-# Inizializza l'oggetto db con l'app Flask
 def init_db(app):
     db.init_app(app)
     with app.app_context():

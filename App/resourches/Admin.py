@@ -11,15 +11,17 @@ admin_route = Blueprint('admin_route', __name__)
 
 @admin_route.route('/admin', methods=['GET', 'POST', 'DELETE', 'PUT'])
 def admin():
-
     if request.method == 'GET':
+        # Riconosco il metodo GET il quale consiste nel selezionare il nome, cognome, email, data di nascita di ogni
+        # valutatore e passarli al template HTML per la loro rappresentazione
         column_names = ["Name", "Surname", "Email", "Date of Birth", "Remove"]
         data = adminSess.execute(
             select(User.name, User.surname, User.email, User.birthdate, User.uuid).where(
                 Evaluator.userUuid == User.uuid)).all()
         return render_template('HomeAdmin.html', column_names=column_names, data=data)
     elif request.method == 'POST':
-        if request.form.get('action') == "rimuovi":  # Rimuovi Evaluator
+        # Il metodo POST ha due azioni principali, l'aggiunta e la rimozione di valutatori
+        if request.form.get('action') == "rimuovi":  # Rimuovi valutatore
             try:
                 val_to_remove = request.form['rimuovi_val']
                 adminSess.execute(delete(User).where(User.uuid == val_to_remove))
@@ -28,7 +30,7 @@ def admin():
                 print(e)
                 evSess.rollback()
             return redirect(url_for('admin_route.admin'))
-        else:  # Aggiungi Evaluator
+        else:  # Aggiungi valutatore
             try:
                 birthdate = datetime.strptime(request.form['birthdate'], '%Y-%m-%d')
                 new_eval = Evaluator(name=request.form['name'], surname=request.form['surname'],
