@@ -14,7 +14,7 @@ CREATE TABLE "users"
     "name"        VARCHAR NOT NULL,
     "surname"     VARCHAR NOT NULL,
     "email"       VARCHAR NOT NULL UNIQUE,
-    "birthdate"   DATE NOT NULL,
+    "birthdate"   DATE NOT NULL CHECK ( date_part('YEAR', age(birthdate)) >= 18),
     PRIMARY KEY ("uuid")
 
 );
@@ -81,9 +81,9 @@ CREATE TABLE "versions"
     "uuid"             UUID DEFAULT uuid_generate_v4(),
     "FileUuid"         UUID NOT NULL,
     "details"          TEXT,
-    "submitted"        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "submitted"        TIMESTAMP(0) DEFAULT CURRENT_TIMESTAMP,
     "file"             BYTEA,
-    "version"          INTEGER,
+    "version"          INTEGER NOT NULL,
     PRIMARY KEY ("uuid"),
     FOREIGN KEY ("FileUuid") REFERENCES "files" ("uuid") ON DELETE CASCADE
 );
@@ -94,7 +94,8 @@ CREATE TABLE "reports"
     "EvaluatorUuid"   UUID NOT NULL,
     "VersionsUuid"    UUID NOT NULL,
     "description"     TEXT,
-    "submitted"        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    "file"            BYTEA NOT NULL,
+    "submitted"       TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY ("uuid", "EvaluatorUuid", "VersionsUuid"),
     FOREIGN KEY ("EvaluatorUuid") REFERENCES "evaluators" ("userUuid") ON DELETE CASCADE,
     FOREIGN KEY ("VersionsUuid") REFERENCES "versions" ("uuid") ON DELETE CASCADE

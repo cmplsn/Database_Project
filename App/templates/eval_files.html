@@ -3,27 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <title>Evaluate files</title>
+        <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        header {
+            background-color: #007bff;
+            color: #fff;
+            text-align: center;
+            padding: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        main {
+            display: flex;
+            width: 100%;
+            box-sizing: border-box;
+            justify-content: space-between; /* Modifica: sposta a destra il form di aggiunta */
+        }
+
+        table {
+            width: 100%; /* Modifica: centra la lista di valutatori */
+            text-align: center;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 300px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+        }
+
+        input[type="submit"], input[type="file"] {
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
+<header>
 <h1>{{ project.title }}</h1>
-<h3>Lista file non approvati</h3>
+    <div class="d-flex align-items-center col-auto">
+            <a href="/logout" class="btn btn-link px-3 me-2">
+                Logout
+            </a>
+        </div>
+</header>
+<h3>Lista file</h3>
 <table>
     <tr>
         <th>Titolo</th>
         <th>Scarica</th>
-        <th>Inserisci report</th>
+        <th>Inserisci descrizione</th>
+        <th>Carica report</th>
         <th>Salva</th>
     </tr>
     {% for file in project.files %}
 
         {% if file.getLastVersion() != none and file.getLastVersion().Version.reports == [] %}
             <tr>
-                <form method="post">
+                <form method="post" enctype="multipart/form-data">
                     <input type="hidden" name="fileUuid" value="{{ file.uuid }}">
                     <input type="hidden" name="versionUuid" value="{{ file.getLastVersion().Version.uuid }}">
                     <th>{{ file.title }}</th>
                     <th><a href="/get_version/{{ file.uuid }}/{{ file.getLastVersion().Version.uuid }}">Apri</a></th>
                     <th><input type="text" name="report" id="report" required></th>
+                    <th><input type="file" name="newreport" id="newreport" name="Carica"></th>
                     <th><input type="submit"></th>
                 </form>
             </tr>
@@ -35,7 +109,8 @@
     <tr>
         <th>Titolo</th>
         <th>Scarica</th>
-        <th>Inserisci report</th>
+        <th>Descrizione</th>
+        <th>Report</th>
     </tr>
     {% for file in project.files %}
 
@@ -44,6 +119,7 @@
                 <th>{{ file.title }}</th>
                 <th><a href="/get_version/{{ file.uuid }}/{{ file.getLastVersion().Version.uuid }}">Apri</a></th>
                 <th>{{ file.getLastVersion().Version.reports[0].description }}</th>
+                <th><a href="/get_report/{{ file.uuid }}/{{ file.getLastVersion().Version.reports[0].uuid }}">Apri</a></th>
             </tr>
         {% endif %}
     {% endfor %}

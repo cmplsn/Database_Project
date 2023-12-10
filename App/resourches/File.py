@@ -13,13 +13,12 @@ file_route = Blueprint('file_route', __name__)
 def file_page(uuid_file):
     try:
         if request.method == 'GET':
-            # TODO: Aggiungere controllo se l'utente ha accesso a quel file
             file = resSess.execute(select(File).where(File.uuid == uuid_file)).fetchone().File
             return render_template('File.html', file=file)
         elif request.method == 'POST':
             resSess.add(Version(submitted=datetime.now(), FileUuid=uuid_file, details=request.form['details'], version=request.form['version'], file=request.files['newVersion'].read()))
             resSess.commit()
-            return redirect(url_for('res_route.file_page'))
+            return redirect('/file_page/' + uuid_file)
     except Exception as e:
         print(e)
         resSess.rollback()
@@ -37,8 +36,6 @@ def get_pdf(file_uuid, version_uuid):
             response.headers['Content-Disposition'] = \
                 'inline; filename=%s.pdf' % 'yourfilename'
             return response
-
-            #return render_template('File.html', file=file)
     except Exception as e:
         print(e)
         resSess.rollback()

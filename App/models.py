@@ -25,16 +25,16 @@ class EvaluationsEnum(enum.Enum):  # todo: capire bene sta cosa degli enum come 
 
     @staticmethod
     def getStringEvaluation(enum):
-        if enum == EvaluationsEnum.approvato: return 'approvato'
-        elif enum == EvaluationsEnum.sottomessoperval: return 'sottomesso per valutazione'
-        elif enum == EvaluationsEnum.modificare: return 'modificare'
-        else: return 'non approvato'
+        if enum == EvaluationsEnum.approvato: return 'APPROVATO'
+        elif enum == EvaluationsEnum.sottomessoperval: return 'SOTTOMESSO PER VALUTAZIONE'
+        elif enum == EvaluationsEnum.modificare: return 'MODIFICARE'
+        else: return 'NON APPROVATO'
 
     @staticmethod
     def getEvaluationsEnum(str):
-        if str == 'approvato': return EvaluationsEnum.approvato
-        elif str == 'sottomessoperval': return EvaluationsEnum.sottomessoperval
-        elif str == 'modificare': return EvaluationsEnum.modificare
+        if str == 'APPROVATO': return EvaluationsEnum.approvato
+        elif str == 'SOTTOMESSO PER VALUTAZIONE': return EvaluationsEnum.sottomessoperval
+        elif str == 'MODIFICARE': return EvaluationsEnum.modificare
         else: return EvaluationsEnum.nonapprovato
 
 
@@ -200,7 +200,7 @@ class Version(db.Model):
     details = Column(Text)
     submitted = Column(DateTime, default=datetime.now())
     file = Column(LargeBinary)
-    version = Column(Integer)
+    version = Column(Integer, nullable=False)
     files = relationship("File", back_populates="versions")
 
     reports = relationship("Report", back_populates="version")
@@ -234,12 +234,14 @@ class Report(db.Model):
     EvaluatorUuid = Column(UUID(as_uuid=True), ForeignKey('evaluators.userUuid'), nullable=False)
     VersionsUuid = Column(UUID(as_uuid=True), ForeignKey('versions.uuid', ondelete='CASCADE'))
     description = Column(Text)
+    file = Column(LargeBinary)
     submitted = Column(DateTime, default=datetime.now())
     version = relationship("Version", back_populates="reports")
 
-    def __init__(self, description: Text, EvaluatorUuid: UUID, VersionsUuid: UUID, uuid: UUID = null):
+    def __init__(self, description: Text, EvaluatorUuid: UUID, VersionsUuid: UUID, file: LargeBinary, uuid: UUID = null):
         self.description = description
         self.EvaluatorUuid = EvaluatorUuid
+        self.file = file
         self.VersionsUuid = VersionsUuid
 
         if uuid != null:
