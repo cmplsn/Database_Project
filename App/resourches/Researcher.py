@@ -1,11 +1,8 @@
-from datetime import datetime
-
-import requests
 from flask import *
 from flask_login import current_user, login_required
 from sqlalchemy import *
 from App.models import *
-from App.db import resSess, adminSess
+from App.db import resSess
 
 res_route = Blueprint('res_route', __name__)
 
@@ -43,13 +40,14 @@ def res_private():
             elif request.path == '/res_private':  # Aggiungi progetto
                 data = request.get_json()
                 new_prj = Project(title=data['title'], description=data['description'])
-                # Aggiungi gli autori dal form escludendo l'utente corrente
+                # Aggiunta degli autori dal form escludendo l'utente corrente
                 for email in data['emails']:
                     if email != current_user.email:
                         us = resSess.execute(select(Researcher).where(Researcher.email == email)).fetchone()
                         if us:
                             us = us.Researcher
                             new_prj.researchers.append(us)
+                # Aggiunta dell'utente corrente
                 new_prj.researchers.append(user)
                 resSess.add(new_prj)
                 resSess.commit()

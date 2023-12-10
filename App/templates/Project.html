@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat App</title>
+    <title>Pagina Progetto</title>
     <style>
 
         body {
@@ -135,7 +135,9 @@
                 <thead>
                     <tr>
                         <th>Title</th>
-                        <th>Remove</th>
+                        {% if not closed %}
+                            <th>Remove</th>
+                        {% endif %}
                     </tr>
                 </thead>
                 <tbody>
@@ -150,16 +152,19 @@
                                 {% endif %}
                             {% endfor %}
                             <td>
+                                {% if not closed %}
                                 <form action="{{ url_for('prj_route.prj_private', prj_id=prj.uuid) }}" method="post">
                                     <input type="hidden" name="action" value="elimina">
                                     <button type="submit" name="elimina_file" value="{{ row[0] }}">Elimina</button>
                                 </form>
+                                {% endif%}
                             </td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
+    {% if not closed %}
         <div>
         <h2>Crea nuovo File</h2>
         <form method="post" id="FileForm">
@@ -170,6 +175,7 @@
             </div>
             <input type="submit" value="Add">
         </form>
+            {% endif %}
     </div>
         <div>
             <h2>Messaggi</h2>

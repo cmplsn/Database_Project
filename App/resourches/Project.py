@@ -1,19 +1,22 @@
-from datetime import datetime
-import requests
 from flask import *
 from flask_login import *
 from sqlalchemy import *
 from App.models import *
-from App.db import resSess, adminSess
+from App.db import resSess
 
 prj_route = Blueprint('prj_route', __name__)
 
 
 @prj_route.route('/prj_private/<prj_id>', methods=['GET', 'POST', 'DELETE', 'PUT'])
+@login_required
 def prj_private(prj_id):
     try:
         prj = resSess.execute(select(Project).where(Project.uuid == prj_id)).fetchone()
         prj = prj.Project
+        if prj.status == EvaluationsEnum.approvato or prj.status == EvaluationsEnum.nonapprovato:
+            closed = True
+        else:
+            closed = False
         if request.method == 'GET':
             pro_files = prj.files
             pro_messages = prj.messages
@@ -21,7 +24,7 @@ def prj_private(prj_id):
             mex = [[mex.text, mex.date, mex.sender] for mex in pro_messages]
             return render_template('Project.html',
                                    files=files,
-                                   prj=prj, mex=mex)
+                                   prj=prj, mex=mex, closed=closed)
         elif request.method == 'POST':
             if request.form.get('action') == "elimina":  # Elimina progetto
                 prj_to_remove = request.form['elimina_file']

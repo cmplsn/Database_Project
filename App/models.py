@@ -1,10 +1,7 @@
-import datetime
 import enum
 from datetime import datetime
-
 import bcrypt
 import uuid
-
 from flask_login import UserMixin
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import Column, ForeignKey, Integer, String, Text, Enum, Date, DateTime, LargeBinary, null, Table, desc, \

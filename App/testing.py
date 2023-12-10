@@ -10,20 +10,17 @@ from datetime import datetime
 
 def populate_database():
         # Create an admin user
-        admin_user = Admin(name='Admin', surname='User', email='adm', password='pwd',
+        admin_user = Admin(name='Admin', surname='User', email='adm@d', password='pwd',
                            birthdate=datetime.now())
         adminSess.add(admin_user)
         adminSess.commit()
         # Create a researcher user
-        researcher_user = Researcher(name='Researcher', surname='User', email='res',
-                                     password='pwd', birthdate=datetime.now(), cv=b'cv_data')
-        researcher_user1 = Researcher(name='Researcher', surname='User', email='ress',
+        researcher_user = Researcher(name='Researcher', surname='User', email='res@a',
                                      password='pwd', birthdate=datetime.now(), cv=b'cv_data')
         adminSess.add(researcher_user)
-        adminSess.add(researcher_user1)
         adminSess.commit()
         # Create an evaluator user
-        evaluator_user = Evaluator(name='Evaluator', surname='User', email='ev',
+        evaluator_user = Evaluator(name='Evaluator', surname='User', email='ev@d',
                                    password='pwd', birthdate=datetime.now(), cv=b'cv_data')
         adminSess.add(evaluator_user)
         adminSess.commit()

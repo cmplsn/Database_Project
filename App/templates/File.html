@@ -105,6 +105,7 @@
         </tr>
     {% endfor %}
 </table>
+{% if not closed %}
 <h3>Aggiungi una nuova versione</h3>
 <form method="post" enctype="multipart/form-data">
     <label for="">Versione</label>
@@ -116,6 +117,7 @@
     <input type="file" name="newVersion" id="newVersion" name="">
     <input type="submit">
 </form>
+{% endif %}
 <h2></h2>
 </body>
 </html>

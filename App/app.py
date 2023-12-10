@@ -1,12 +1,6 @@
-from datetime import timedelta, date, datetime
-import requests.cookies
 from flask import *
+from flask_ipban import IpBan
 from flask_login import *
-from flask_login import login_manager
-from flask_smorest import *
-# from flask_security import Security
-# from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import *
 from resourches.Evaluator import eval_route
 from resourches.File import file_route
 from resourches.Project import prj_route
@@ -18,34 +12,20 @@ from testing import populate_database
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'askh7-wur0z!'
-app.config['API_TITLE'] = "BAsi di Dati"
-app.config['API_VERSION'] = "v1"
-app.config['OPENAPI_VERSION'] = "3.0.3"
-app.config['OPENAPI_URL_PREFIX'] = "/"
-app.config['OPENAPI_SWAGGER_UI_PATH'] = "/swagger-ui"
-app.config['OPENAPI_SWAGGER_UI_URL'] = "https://cdn.jsdelivr.net/npm/swagger-ui-dist/"
-# app.config['SQLALCHEMY_DATABASE_URI'] = url_admin
+app.config['API_TITLE'] = "Basi di Dati"
+
 app.register_blueprint(admin_route)
 app.register_blueprint(res_route)
 app.register_blueprint(prj_route)
 app.register_blueprint(eval_route)
 app.register_blueprint(file_route)
 
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 
-api = Api(app)
+ip_ban = IpBan(ban_count=5)
+ip_ban.init_app(app)
 
-# dbase = SQLAlchemy(app)
-# app.security = Security(app)
-# todo: controllare cos'è
-# ip_ban = IpBan(ban_count=5)
-# ip_ban.init_app(app)
-
-
-print("ho iniziato exe app")
-#populate_database()
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -63,10 +43,11 @@ def load_user(user_id):
     else:
         return evaluator.Evaluator
 
-@app.route('/')
-def home():  # put application's code here
 
+@app.route('/')
+def home():
     return redirect(url_for('registration'))
+
 
 @app.route('/registration', methods=['GET', 'POST'])
 def registration():
@@ -93,8 +74,8 @@ def registration():
 def login():
     print('sono entrato in login()')
     # settato la chiusura della sessione dopo tempo max 5 minuti
-    #session.permanent = True
-    #app.permanent_session_lifetime = timedelta(minutes=5)
+    # session.permanent = True
+    # app.permanent_session_lifetime = timedelta(minutes=5)
 
     # riconosco metodo di richiesto come POST dal form html
     if request.method == 'POST':
@@ -102,9 +83,9 @@ def login():
             # Verifica se User è presente in db "USER"
             user = evSess.execute(select(User).where(User.email == request.form['email'])).fetchone()
             if user is None:
+                ip_ban.add()
                 return render_template('Login.html', login_error=True)
             adm = adminSess.execute(select(Admin).where(Admin.userUuid == user[0].uuid)).fetchone()
-            print(adm)
             ev = evSess.execute(select(Evaluator).where(Evaluator.userUuid == user[0].uuid)).fetchone()
             res = resSess.execute(select(Researcher).where(Researcher.userUuid == user[0].uuid)).fetchone()
 
@@ -156,42 +137,9 @@ def login():
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('login'))
-
-
-def init_database():
-    from config import Config
-    # Popola il database con i dati di esempio
-    with app.app_context():
-
-        for user_data in Config.USERS_DATA:
-            users = User(name=user_data[0], surname=user_data[1], email=user_data[2], dateofbirth=user_data[3])
-            adminSess.add(users)
-        adminSess.commit()
-
-        for admin_data in Config.ADMIN_DATA:
-            admin0 = Admin(userUuid=adminSess.execute(select(User).where(User.surname == 'Admin')),
-                           password=admin_data[0])
-            adminSess.add(admin0)
-
-        for researcher_data in Config.RESEARCHERS_DATA:
-            researcher0 = Researcher(userUuid=adminSess.execute(select(User).where(User.surname == 'Researcher')),
-                                     cv=researcher_data[2], password=researcher_data[1])
-            adminSess.add(researcher0)
-
-        for evaluator_data in Config.EVALUATOR_DATA:
-            evaluator0 = Evaluator(userUuid=adminSess.execute(select(User).where(User.surname == 'Evaluator')),
-                                   cv=evaluator_data[2], password=evaluator_data[1])
-            adminSess.add(evaluator0)
-
-        for project_data in Config.PROJECT_DATA:
-            project0 = Project(title=project_data[0], description=project_data[1], status=project_data[2])
-            adminSess.add(project0)
-
-        adminSess.commit()
+    return redirect(url_for('registration'))
 
 
 if __name__ == '__main__':
-    # init_database()
-    #populate_database()
+    # populate_database()
     app.run()
