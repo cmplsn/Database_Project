@@ -71,18 +71,13 @@ def registration():
 
 
 @app.route('/login', methods=['GET', 'POST'])
-def login():
-    print('sono entrato in login()')
-    # settato la chiusura della sessione dopo tempo max 5 minuti
-    # session.permanent = True
-    # app.permanent_session_lifetime = timedelta(minutes=5)
-
+def login():  # Funzione di login per l'autenticazione e l'accesso alla propria area riservata
     # riconosco metodo di richiesto come POST dal form html
     if request.method == 'POST':
         try:
             # Verifica se User è presente in db "USER"
             user = evSess.execute(select(User).where(User.email == request.form['email'])).fetchone()
-            if user is None:
+            if user is None:  # Se lo user non esiste (credenziali sbagliate) viene incrementato il conto di ipBan
                 ip_ban.add()
                 return render_template('Login.html', login_error=True)
             adm = adminSess.execute(select(Admin).where(Admin.userUuid == user[0].uuid)).fetchone()
@@ -91,7 +86,6 @@ def login():
 
             # Controlla se sta facendo login Admin
             if adm is not None:
-                print('ho trovato Admin in login')
                 if adm.Admin.auth_pwd(request.form['password']):
                     login_user(adm.Admin)
                     return redirect(url_for('admin_route.admin'))
@@ -100,7 +94,6 @@ def login():
             elif ev is not None:
                 # Controlla se login è di tipo Evaluator
                 ev = ev.Evaluator
-                print('ho trovato evaluator in login')
                 if ev.auth_pwd(request.form['password']):
                     login_user(ev)
                     return redirect(url_for('eval_route.eval_page'))
@@ -109,7 +102,6 @@ def login():
             elif res is not None:
                 # controlla se login è di tipo Researcher
                 res = res.Researcher
-                print('ho trovato researcher in login')
                 if res.auth_pwd(request.form['password']):
                     login_user(res)
                     return redirect(url_for('res_route.res_private'))
@@ -122,7 +114,8 @@ def login():
             evSess.rollback()
         return render_template("Login.html")
     else:
-        if current_user.is_authenticated:
+        if current_user.is_authenticated:  # Se l'utente è ancora autenticato nella sessione viene reinderizzato alla
+            # propria area privata
             if isinstance(current_user, Admin):
                 return redirect(url_for('admin_route.admin'))
             elif isinstance(current_user, Evaluator):
@@ -135,7 +128,7 @@ def login():
 
 @app.route('/logout')
 @login_required
-def logout():
+def logout():  # Funzione di logout che reindirizza alla pagina di registrazione
     logout_user()
     return redirect(url_for('registration'))
 
